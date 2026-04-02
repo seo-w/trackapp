@@ -9,10 +9,23 @@ namespace App\Support;
  */
 final class CurlHttpClient
 {
+    /** @var float */
+    private $timeoutSeconds;
+
+    /** @var float */
+    private $connectTimeoutSeconds;
+
+    /** @var bool */
+    private $sslVerify;
+
     public function __construct(
-        private float $timeoutSeconds = 15.0,
-        private float $connectTimeoutSeconds = 5.0,
+        float $timeoutSeconds = 15.0,
+        float $connectTimeoutSeconds = 5.0,
+        bool $sslVerify = true
     ) {
+        $this->timeoutSeconds = $timeoutSeconds;
+        $this->connectTimeoutSeconds = $connectTimeoutSeconds;
+        $this->sslVerify = $sslVerify;
     }
 
     /**
@@ -47,6 +60,8 @@ final class CurlHttpClient
             CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
             CURLOPT_HTTPHEADER => $headerList,
             CURLOPT_USERAGENT => 'TrackApp/MerkawebService (PHP cURL)',
+            CURLOPT_SSL_VERIFYPEER => $this->sslVerify,
+            CURLOPT_SSL_VERIFYHOST => $this->sslVerify ? 2 : 0,
         ]);
 
         $body = curl_exec($ch);

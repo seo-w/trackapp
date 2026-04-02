@@ -11,10 +11,7 @@ use App\Application;
  */
 final class Redirect
 {
-    /**
-     * @param int $status 302 por defecto; 303 recomendable tras POST explícito
-     */
-    public static function to(string $url, int $status = 302): never
+    public static function to(string $url, int $status = 302)
     {
         $location = self::normalizeUrl($url);
         http_response_code($status);
@@ -23,7 +20,7 @@ final class Redirect
         exit;
     }
 
-    public static function back(int $status = 302): never
+    public static function back(int $status = 302)
     {
         $referer = $_SERVER['HTTP_REFERER'] ?? '/';
         $target = is_string($referer) && $referer !== '' ? $referer : '/';
@@ -47,7 +44,7 @@ final class Redirect
             $base = '';
         }
 
-        $isRelative = str_starts_with($trimmed, '/') && ! str_starts_with($trimmed, '//');
+        $isRelative = (isset($trimmed[0]) && $trimmed[0] === '/') && ! (isset($trimmed[1]) && $trimmed[1] === '/');
         if ($base !== '' && $isRelative) {
             return $base . $trimmed;
         }

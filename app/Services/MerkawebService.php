@@ -16,18 +16,30 @@ final class MerkawebService
     /** @var list<int> */
     public const ALLOWED_ESTADOS = [2, 3, 4, 5];
 
+    /** @var AppSettingsRepository */
+    private $settingsRepository;
+
+    /** @var Crypt */
+    private $crypt;
+
+    /** @var CurlHttpClient */
+    private $http;
+
     public function __construct(
-        private AppSettingsRepository $settingsRepository,
-        private Crypt $crypt,
-        private CurlHttpClient $http,
+        $settingsRepository,
+        $crypt,
+        $http
     ) {
+        $this->settingsRepository = $settingsRepository;
+        $this->crypt = $crypt;
+        $this->http = $http;
     }
 
     /**
      * @param array<string, mixed> $appConfig Típicamente config('app') completo (key + merkaweb)
      * @param CurlHttpClient|null $http Inyectable en pruebas
      */
-    public static function fromApp(array $appConfig, AppSettingsRepository $repository, ?CurlHttpClient $http = null): self
+    public static function fromApp(array $appConfig, AppSettingsRepository $repository, $http = null)
     {
         $mw = $appConfig['merkaweb'] ?? [];
         if (! is_array($mw)) {
@@ -37,19 +49,20 @@ final class MerkawebService
         $client = $http ?? new CurlHttpClient(
             (float) ($mw['http_timeout'] ?? 15),
             (float) ($mw['http_connect_timeout'] ?? 5),
+            (bool) ($mw['ssl_verify'] ?? false)
         );
 
         return new self(
             $repository,
             Crypt::fromAppConfig($appConfig),
-            $client,
+            $client
         );
     }
 
     /**
      * Prueba conectividad y credenciales con una consulta GET a órdenes en estado 2.
      */
-    public function testConnection(): MerkawebResult
+    public function testConnection()
     {
         $result = $this->findOrdenesByEstado(2);
         if (! $result->ok) {
@@ -72,7 +85,7 @@ final class MerkawebService
     /**
      * GET /ordenes/find?tienda_id=…&estado=… con Authorization: Bearer …
      */
-    public function findOrdenesByEstado(int $estado, ?string $fechaDesde = null, ?string $fechaHasta = null): MerkawebResult
+    public function findOrdenesByEstado($estado, $fechaDesde = null, $fechaHasta = null)
     {
         if (! in_array($estado, self::ALLOWED_ESTADOS, true)) {
             return MerkawebResult::fail(
@@ -99,7 +112,7 @@ final class MerkawebService
     /**
      * GET /productos/{id} con Authorization: Bearer …
      */
-    public function findProductoById(string $productId): MerkawebResult
+    public function findProductoById($productId)
     {
 
         $credentials = $this->resolveCredentials();
@@ -120,7 +133,7 @@ final class MerkawebService
     /**
      * @return array{api_base_url: string, tienda_id: string, token: string}|MerkawebResult
      */
-    private function resolveCredentials(): array|MerkawebResult
+    private function resolveCredentials()
     {
         $row = $this->settingsRepository->first();
         if ($row === null) {
@@ -172,7 +185,7 @@ final class MerkawebService
         ];
     }
 
-    private function buildFindUrl(string $apiBaseUrl, string $tiendaId, int $estado, ?string $fechaDesde = null, ?string $fechaHasta = null): string
+    private function buildFindUrl($apiBaseUrl, $tiendaId, $estado, $fechaDesde = null, $fechaHasta = null)
     {
         $params = [
             'tienda_id' => $tiendaId,
@@ -195,7 +208,7 @@ final class MerkawebService
     /**
      * @param array{error: ?string, status: int, body: string, curl_errno: int} $response
      */
-    private function interpretHttpResponse(array $response): MerkawebResult
+    private function interpretHttpResponse($response)
     {
         $status = $response['status'];
         $body = $response['body'];
@@ -246,7 +259,7 @@ final class MerkawebService
         return MerkawebResult::ok('OK', $status, $decoded);
     }
 
-    private function curlFailureMessage(int $errno, string $curlError): string
+    private function curlFailureMessage($errno, $curlError)
     {
         if ($errno === 28) {
             return 'Tiempo de espera agotado al contactar con Merkaweb.';
