@@ -1,0 +1,243 @@
+/* TrackApp — capa visual sobria sobre Bootstrap 5 */
+
+:root {
+    --track-bg: #f4f6f8;
+    --track-surface: #ffffff;
+    --track-border: rgba(15, 23, 42, 0.08);
+    --track-text: #1e293b;
+    --track-muted: #64748b;
+    --track-accent: #0d6efd;
+    --track-radius: 0.5rem;
+    --track-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --track-shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.08);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1;
+    color: var(--track-text);
+    background: var(--track-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+main {
+    flex: 1 0 auto;
+}
+
+.track-navbar {
+    background: var(--track-surface);
+    border-bottom: 1px solid var(--track-border);
+    box-shadow: var(--track-shadow);
+}
+
+.track-brand {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--track-text) !important;
+}
+
+.track-brand .bi {
+    color: var(--track-accent);
+}
+
+.track-nav-link {
+    font-weight: 500;
+    color: var(--track-muted) !important;
+    border-radius: var(--track-radius);
+    padding: 0.45rem 0.75rem !important;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.track-nav-link:hover {
+    color: var(--track-text) !important;
+    background: rgba(13, 110, 253, 0.06);
+}
+
+.track-nav-link.active {
+    color: var(--track-accent) !important;
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.track-page-header {
+    padding: 2rem 0 1.25rem;
+}
+
+.track-page-title {
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.35rem;
+}
+
+.track-page-lead {
+    color: var(--track-muted);
+    max-width: 42rem;
+    margin-bottom: 0;
+}
+
+.track-card {
+    border: 1px solid var(--track-border);
+    border-radius: var(--track-radius);
+    box-shadow: var(--track-shadow);
+    background: var(--track-surface);
+}
+
+.track-card--emphasis {
+    box-shadow: var(--track-shadow-lg);
+    border-color: transparent;
+}
+
+.track-footer {
+    border-top: 1px solid var(--track-border);
+    background: var(--track-surface);
+    color: var(--track-muted);
+    font-size: 0.875rem;
+    margin-top: 3rem;
+}
+
+.track-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--track-muted);
+    background: rgba(15, 23, 42, 0.05);
+    border-radius: 999px;
+    padding: 0.25rem 0.65rem;
+}
+
+.track-icon-circle {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 110, 253, 0.12);
+    color: var(--track-accent);
+    font-size: 1.25rem;
+}
+
+.track-placeholder-panel {
+    border: 1px dashed rgba(13, 110, 253, 0.35);
+    background: rgba(13, 110, 253, 0.04);
+    border-radius: var(--track-radius);
+    padding: 1.25rem 1.5rem;
+}
+
+.track-placeholder-panel .bi {
+    opacity: 0.85;
+}
+
+.track-settings-alert {
+    border-radius: var(--track-radius);
+}
+
+.track-settings-form .form-control-lg {
+    border-radius: var(--track-radius);
+}
+
+.track-settings-form .input-group-lg > .btn {
+    border-radius: 0 var(--track-radius) var(--track-radius) 0;
+}
+
+.track-estado-check {
+    background: var(--track-surface);
+    border-color: var(--track-border) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.track-estado-check:has(.form-check-input:checked) {
+    border-color: rgba(13, 110, 253, 0.45) !important;
+    box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.12);
+}
+
+.track-consulta-form legend {
+    float: none;
+}
+
+/* —— Tablas Premium —— */
+.table-premium {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.table-premium thead th {
+    background: #f8fafc !important;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    padding: 1rem 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+.table-premium tbody tr {
+    transition: all 0.2s ease;
+}
+.table-premium tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.03) !important;
+    transform: scale(1.002);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    position: relative;
+    z-index: 1;
+}
+.table-premium td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+.table-striped-soft tbody tr:nth-of-type(odd) {
+    background-color: #fbfcfe;
+}
+
+/* —— Semaforización (Semaphoring) —— */
+.semaphore-success { border-left: 4px solid #10b981; }
+.semaphore-warning { border-left: 4px solid #f59e0b; }
+.semaphore-danger { border-left: 4px solid #ef4444; }
+.semaphore-info { border-left: 4px solid #3b82f6; }
+
+/* —— Animación de Esqueleto (Skeleton) —— */
+@keyframes skeleton-loading {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+.skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* —— Paginación Social —— */
+.track-pagination .page-link {
+    border: none;
+    color: var(--track-muted);
+    font-weight: 500;
+    padding: 0.5rem 0.85rem;
+    margin: 0 0.15rem;
+    border-radius: var(--track-radius);
+    transition: all 0.2s;
+}
+.track-pagination .page-link:hover {
+    background: rgba(13, 110, 253, 0.08);
+    color: var(--track-accent);
+}
+.track-pagination .page-item.active .page-link {
+    background: var(--track-accent);
+    color: white;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);
+}
+
+@media (max-width: 991px) {
+    .table-premium td { padding: 0.75rem 0.5rem; }
+}
+
