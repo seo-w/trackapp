@@ -76,43 +76,43 @@ $noFormErr = $formError === null || $formError === '';
 ?>
 <style>
     .track-filter-bar {
-        background: rgba(19, 28, 43, 0.7);
-        backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
-        border: 1px solid rgba(132, 148, 149, 0.15);
+        background: var(--track-surface);
+        backdrop-filter: var(--track-blur);
+        -webkit-backdrop-filter: var(--track-blur);
+        border: 1px solid var(--track-border);
         border-radius: 16px;
         padding: 2.5rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
     .track-input-group {
         position: relative;
         display: flex;
         align-items: center;
-        background: rgba(34, 42, 58, 0.5); /* surface_container_high */
+        background: var(--track-surface-high);
         border: none;
-        border-bottom: 2px solid rgba(59, 73, 75, 0.8); /* outline_variant */
+        border-bottom: 2px solid var(--track-border);
         border-radius: 8px 8px 0 0;
         padding: 0.8rem 1rem;
         transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
     }
     .track-input-group:focus-within {
-        border-bottom-color: #00f0ff;
-        background: rgba(0, 240, 255, 0.05);
-        box-shadow: 0 10px 15px -5px rgba(0, 240, 255, 0.1);
+        border-bottom-color: var(--track-primary);
+        background: var(--track-hover-bg);
+        box-shadow: 0 10px 15px -5px var(--track-accent-glow);
     }
     .track-input-group .form-control {
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
         height: auto !important;
-        color: #dbe2f8 !important;
+        color: var(--track-text) !important;
         padding-left: 0.5rem !important;
     }
     .track-label-mini {
         font-size: 0.65rem;
         font-weight: 800;
         text-transform: uppercase;
-        color: #dbe2f8; /* on_surface */
+        color: var(--track-table-head);
         letter-spacing: 0.1em;
         margin-bottom: 0.8rem;
         display: block;
@@ -125,73 +125,71 @@ $noFormErr = $formError === null || $formError === '';
         gap: 0.4rem;
         padding: 0.35rem 0.8rem;
         border-radius: 9999px;
-        background: rgba(45, 53, 70, 0.4);
-        border: 1px solid rgba(132, 148, 149, 0.2);
-        color: #b9cacb;
+        background: var(--track-card-bg);
+        border: 1px solid var(--track-border);
+        color: var(--track-muted);
         cursor: pointer;
-        font-weight: 700;
+        font-weight: 500;
         font-size: 1rem; /* 16px */
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
     }
     
     .track-filter-active-panel {
-        background: rgba(0, 240, 255, 0.03);
-        border: 1px solid rgba(0, 240, 255, 0.2);
+        background: var(--track-hover-bg);
+        border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.2);
         color: #00f0ff;
         border-radius: 12px;
         padding: 1.2rem;
     }
     .track-status-pill:hover { 
-        border-color: rgba(0, 240, 255, 0.4);
-        color: #dbe2f8;
-        background: rgba(0, 240, 255, 0.08);
+        border-color: rgba(var(--track-primary-rgb, 0, 240, 255), 0.4);
+        color: var(--track-text);
+        background: var(--track-hover-bg);
     }
 
     .track-status-pill.active {
-        color: #001f24 !important;
-        font-weight: 800 !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        color: #fff !important;
+        font-weight: 600 !important;
+        box-shadow: 0 0 15px var(--track-accent-glow);
     }
     .track-status-pill.active i {
-        color: #001f24 !important;
+        color: #fff !important;
     }
-    .track-status-pill.active[data-status="4"], .track-status-pill.active[data-status="4"] i { color: #3b0000 !important; }
-    .track-status-pill.active[data-status="5"], .track-status-pill.active[data-status="5"] i { color: #3a0033 !important; }
 
-    .track-status-pill.active[data-status="2"] { background: linear-gradient(135deg, #00dbe9 0%, #00f0ff 100%); border-color: transparent; }
-    .track-status-pill.active[data-status="3"] { background: linear-gradient(135deg, #00f0ff 0%, #00dbe9 100%); border-color: transparent; }
-    .track-status-pill.active[data-status="4"] { background: linear-gradient(135deg, #ffb4ab 0%, #ff897d 100%); border-color: transparent; }
-    .track-status-pill.active[data-status="5"] { background: linear-gradient(135deg, #fface8 0%, #ff24e4 100%); border-color: transparent; }
+    .track-status-pill.active[data-status="2"] { background: var(--track-primary); border-color: transparent; }
+    .track-status-pill.active[data-status="3"] { background: var(--track-success); border-color: transparent; }
+    .track-status-pill.active[data-status="4"] { background: var(--track-warning); border-color: transparent; }
+    .track-status-pill.active[data-status="5"] { background: var(--track-info); border-color: transparent; }
 
     .btn-search-main {
-        background: rgba(0, 240, 255, 0.08) !important;
-        color: #00f0ff !important;
+        background: var(--track-hover-bg) !important;
+        color: var(--track-primary) !important;
         font-weight: 700;
         font-size: 0.9rem;
         padding: 0.6rem 1.2rem;
         border-radius: 0.35rem;
-        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.3) !important;
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     .btn-search-main:hover {
-        background: rgba(0, 240, 255, 0.15) !important;
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        background: rgba(var(--track-primary-rgb, 0,255,255), 0.15) !important;
+        border-color: var(--track-primary) !important;
+        box-shadow: 0 0 15px var(--track-accent-glow);
     }
 </style>
 
 <div class="container track-page-header pt-5 mt-4 mb-4">
     <div class="d-flex align-items-center gap-4">
-        <div class="track-icon-circle shadow-lg rounded-circle" style="width: 64px; height: 64px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.2);">
-            <i class="bi bi-radar fs-3 text-primary"></i>
+        <div class="track-icon-circle shadow-lg rounded-circle" style="width: 64px; height: 64px; background: rgba(var(--track-primary-rgb, 0,255,255), 0.1); border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.2);">
+            <i class="bi bi-radar fs-3" style="color: var(--track-primary);"></i>
         </div>
         <div>
-            <span class="track-pill mb-2 d-inline-block px-3 py-1 fw-bold" style="background: rgba(0, 240, 255, 0.15); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 9999px; color: #00f0ff;"><i class="bi bi-terminal"></i> Scanner Activo</span>
+            <span class="track-pill mb-2 d-inline-block px-3 py-1 fw-bold" style="background: rgba(var(--track-primary-rgb, 0,255,255), 0.15); border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.3); border-radius: 9999px; color: var(--track-primary);"><i class="bi bi-terminal"></i> Scanner Activo</span>
             <h1 class="track-page-title h1 mb-2 fw-bold text-uppercase" style="letter-spacing: 0.03em; font-family: 'Space Grotesk', sans-serif;">Rastreador de Nodos</h1>
-            <p class="track-page-lead mb-0" style="color: #b9cacb; max-width: 800px;"><?= $sub ?></p>
+            <p class="track-page-lead mb-0" style="color: var(--track-muted); max-width: 800px;"><?= $sub ?></p>
         </div>
     </div>
 </div>
@@ -275,7 +273,7 @@ $noFormErr = $formError === null || $formError === '';
     <?php if ($showResults && $filterSummary !== null && $filterSummary !== ''): ?>
         <div class="track-filter-active-panel mb-4">
             <div class="small mb-1 text-uppercase fw-bold opacity-75" style="letter-spacing:1px; font-size:0.65rem;">Filtros de Nodo Activos</div>
-            <p class="mb-0 fw-bold text-white"><?= htmlspecialchars($filterSummary, ENT_QUOTES, 'UTF-8') ?></p>
+            <p class="mb-0 fw-bold" style="color: var(--track-text);"><?= htmlspecialchars($filterSummary, ENT_QUOTES, 'UTF-8') ?></p>
         </div>
     <?php endif; ?>
 
@@ -370,19 +368,19 @@ $noFormErr = $formError === null || $formError === '';
             }
         }">
             <!-- Filtro de Búsqueda -->
-            <div class="card track-card mb-4 border-0" style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);">
+            <div class="card track-card mb-4 border-0">
                 <div class="card-body py-4">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
                         <div class="flex-grow-1">
                             <label for="consultaBuscar" class="track-label-mini">Búsqueda en resultados</label>
                             <div class="track-input-group">
-                                <i class="bi bi-search me-2" style="color: #00f0ff;"></i>
-                                <input type="search" class="form-control border-0 bg-transparent text-white p-0" id="consultaBuscar" x-model="q" @input="page = 1" placeholder="Filtrar por Nombre, Ciudad, ID..." autocomplete="off">
+                                <i class="bi bi-search me-2" style="color: var(--track-primary);"></i>
+                                <input type="search" class="form-control border-0 bg-transparent p-0" style="color: var(--track-text);" id="consultaBuscar" x-model="q" @input="page = 1" placeholder="Filtrar por Nombre, Ciudad, ID..." autocomplete="off">
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-3">
-                             <span class="text-white small fw-bold" style="letter-spacing: 0.1em;">FILAS POR PÁGINA:</span>
-                             <select class="form-select form-select-sm w-auto bg-dark border-secondary text-white" x-model="pageSize" @change="page = 1" style="border-radius: 8px;">
+                             <span class="small fw-bold" style="color: var(--track-text); letter-spacing: 0.1em;">FILAS POR PÁGINA:</span>
+                             <select class="form-select form-select-sm w-auto border-secondary" x-model="pageSize" @change="page = 1" style="background: var(--track-surface-high); color: var(--track-text); border-radius: 8px;">
                                   <option value="15">15</option>
                                   <option value="30">30</option>
                                   <option value="50">50</option>
@@ -395,10 +393,10 @@ $noFormErr = $formError === null || $formError === '';
 
             <!-- Vista Desktop -->
             <div class="d-none d-lg-block mb-4">
-                <div class="card border-0 overflow-hidden" style="background: rgba(19, 28, 43, 0.7); backdrop-filter: blur(30px); border-radius: 16px; border: 1px solid rgba(132, 148, 149, 0.15); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
+                <div class="card track-card border-0 overflow-hidden" style="background: var(--track-surface); backdrop-filter: var(--track-blur); border-radius: 16px; border: 1px solid var(--track-border); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
                     <div class="table-responsive p-2">
-                        <table class="table align-middle mb-0 table-borderless" style="--bs-table-bg: transparent; --bs-table-color: #dbe2f8; --bs-table-hover-bg: rgba(0, 240, 255, 0.05);">
-                            <thead style="border-bottom: 1px solid rgba(132, 148, 149, 0.2);">
+                        <table class="table align-middle mb-0 table-borderless table-premium">
+                            <thead style="border-bottom: 1px solid var(--track-border);">
                                 <tr>
                                     <th @click="sortBy('id')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em; padding-left: 1.5rem;">Pedido <i class="bi" :class="sortKey === 'id' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
                                     <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Producto</th>
@@ -412,48 +410,48 @@ $noFormErr = $formError === null || $formError === '';
                             </thead>
                             <tbody>
                                 <template x-for="o in paginated" :key="o.id">
-                                    <tr :class="o.statusCode === 4 ? 'semaphore-danger' : (o.statusCode === 3 || o.statusCode === 5 ? 'semaphore-success' : 'semaphore-info')" style="background: transparent !important; transition: background 0.3s ease;" @mouseover="$el.style.background='rgba(0, 240, 255, 0.05)'" @mouseleave="$el.style.background='transparent'">
+                                    <tr :class="o.statusCode === 4 ? 'semaphore-danger' : (o.statusCode === 3 || o.statusCode === 5 ? 'semaphore-success' : 'semaphore-info')" style="background: transparent !important; transition: background 0.3s ease;" @mouseover="$el.style.background='var(--track-hover-bg)'" @mouseleave="$el.style.background='transparent'">
                                         <td style="padding-left: 1.5rem;">
-                                            <div class="fw-bold fs-6" style="color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);" x-text="'#' + o.id"></div>
-                                            <div class="small text-uppercase fw-bold mt-1" style="color: #849495; letter-spacing: 0.05em; font-size: 0.65rem;" x-text="o.carrier.substring(0,12)"></div>
+                                            <div class="fw-bold fs-6" style="color: var(--track-primary); text-shadow: 0 0 10px var(--track-accent-glow);" x-text="'#' + o.id"></div>
+                                            <div class="small text-uppercase fw-bold mt-1" style="color: var(--track-muted); letter-spacing: 0.05em; font-size: 0.65rem;" x-text="o.carrier.substring(0,12)"></div>
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
                                                 <template x-if="o.image">
-                                                    <img :src="o.image" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid rgba(132, 148, 149, 0.2);" loading="lazy">
+                                                    <img :src="o.image" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--track-border);" loading="lazy">
                                                 </template>
                                                 <template x-if="!o.image">
-                                                    <div class="rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(255,255,255,0.05); border: 1px solid rgba(132, 148, 149, 0.2);"><i class="bi bi-box small" style="color: #b9cacb;"></i></div>
+                                                    <div class="rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--track-surface-high); border: 1px solid var(--track-border);"><i class="bi bi-box small" style="color: var(--track-muted);"></i></div>
                                                 </template>
                                                 <div style="line-height: 1.3">
-                                                    <div class="fw-bold text-truncate text-white" style="max-width: 180px;" x-text="o.name || 'Sin nombre'"></div>
-                                                    <div style="font-size: 0.75rem; color: #849495;" x-text="o.warehouse"></div>
+                                                    <div class="fw-bold text-truncate" style="max-width: 180px; color: var(--track-text);" x-text="o.name || 'Sin nombre'"></div>
+                                                    <div style="font-size: 0.75rem; color: var(--track-muted);" x-text="o.warehouse"></div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="fw-medium text-white" x-text="o.customer"></div>
-                                            <div class="d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; color: #849495;">
+                                            <div class="fw-medium" style="color: var(--track-text);" x-text="o.customer"></div>
+                                            <div class="d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; color: var(--track-muted);">
                                                 <span x-text="o.phone"></span>
-                                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" @click="navigator.clipboard.writeText(o.phone).then(() => notify('Teléfono copiado', 'success'))"><i class="bi bi-clipboard" style="color: #00f0ff;"></i></button>
+                                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" @click="navigator.clipboard.writeText(o.phone).then(() => notify('Teléfono copiado', 'success'))"><i class="bi bi-clipboard" style="color: var(--track-info);"></i></button>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="font-monospace d-flex align-items-center gap-2 text-white">
+                                            <div class="font-monospace d-flex align-items-center gap-2" style="color: var(--track-text);">
                                                 <span class="text-truncate" style="max-width: 120px;" x-text="o.guide"></span>
-                                                <button type="button" class="btn btn-sm p-0" title="Copiar Guía" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard" style="color: #00f0ff;"></i></button>
+                                                <button type="button" class="btn btn-sm p-0" title="Copiar Guía" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard" style="color: var(--track-info);"></i></button>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="fw-bold text-white lh-1 mb-1" x-text="o.city"></div>
-                                            <div class="small" style="color: #849495;" x-text="o.dept"></div>
+                                            <div class="fw-bold lh-1 mb-1" style="color: var(--track-text);" x-text="o.city"></div>
+                                            <div class="small" style="color: var(--track-muted);" x-text="o.dept"></div>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
                                         </td>
                                         <td>
-                                            <div class="fw-bold text-white lh-1 mb-1" x-text="o.date"></div>
-                                            <div class="small" style="color: #849495;" x-text="o.time"></div>
+                                            <div class="fw-bold lh-1 mb-1" style="color: var(--track-text);" x-text="o.date"></div>
+                                            <div class="small" style="color: var(--track-muted);" x-text="o.time"></div>
                                         </td>
                                         <td class="text-end px-4">
                                             <template x-if="o.tracking">
@@ -471,7 +469,7 @@ $noFormErr = $formError === null || $formError === '';
             <!-- Vista Móvil -->
             <div class="d-lg-none">
                 <template x-for="o in paginated" :key="o.id">
-                    <div class="card border-0 mb-3 overflow-hidden" style="background: rgba(19, 28, 43, 0.7); backdrop-filter: blur(20px); border-radius: 12px; border: 1px solid rgba(132, 148, 149, 0.15); box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <div class="card track-card border-0 mb-3 overflow-hidden" style="background: var(--track-surface); backdrop-filter: var(--track-blur); border-radius: 12px; border: 1px solid var(--track-border); box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div class="d-flex align-items-center gap-3">
@@ -479,34 +477,34 @@ $noFormErr = $formError === null || $formError === '';
                                         <img :src="o.image" class="rounded shadow-sm" style="width: 48px; height: 48px; object-fit: cover; border: 1px solid rgba(132, 148, 149, 0.2);">
                                     </template>
                                     <div>
-                                        <div class="small fw-bold text-uppercase" style="color: #00f0ff; font-size: 0.65rem;">Pedido #<span x-text="o.id"></span></div>
-                                        <div class="fw-bold text-white lh-sm mt-1" x-text="o.name"></div>
+                                        <div class="small fw-bold text-uppercase" style="color: var(--track-primary); font-size: 0.65rem;">Pedido #<span x-text="o.id"></span></div>
+                                        <div class="fw-bold lh-sm mt-1" style="color: var(--track-text);" x-text="o.name"></div>
                                     </div>
                                 </div>
                                 <span class="badge rounded-pill px-2 py-1" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
                             </div>
                             <div class="row g-3 small mb-3">
                                 <div class="col-6">
-                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: #849495; font-size: 0.65rem;">Cliente</label>
-                                    <div class="fw-medium text-white" x-text="o.customer"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Cliente</label>
+                                    <div class="fw-medium" style="color: var(--track-text);" x-text="o.customer"></div>
                                 </div>
                                 <div class="col-6">
-                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: #849495; font-size: 0.65rem;">Destino</label>
-                                    <div class="fw-medium text-white" x-text="o.city"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Destino</label>
+                                    <div class="fw-medium" style="color: var(--track-text);" x-text="o.city"></div>
                                 </div>
                                 <div class="col-6">
-                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: #849495; font-size: 0.65rem;">Guía</label>
-                                    <div class="font-monospace text-white" x-text="o.guide"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Guía</label>
+                                    <div class="font-monospace" style="color: var(--track-text);" x-text="o.guide"></div>
                                 </div>
                                 <div class="col-6">
-                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: #849495; font-size: 0.65rem;">Actualización</label>
-                                    <div class="text-white" x-text="o.date"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Actualización</label>
+                                    <div style="color: var(--track-text);" x-text="o.date"></div>
                                 </div>
                             </div>
-                            <div class="pt-3 d-flex justify-content-between gap-2" style="border-top: 1px solid rgba(132, 148, 149, 0.15);">
-                                <button class="btn btn-sm w-100 fw-bold" style="background: rgba(255,255,255,0.05); color: #dbe2f8; border: 1px solid rgba(132,148,149,0.2); border-radius: 8px;" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard me-2"></i>Copiar Guía</button>
+                            <div class="pt-3 d-flex justify-content-between gap-2" style="border-top: 1px solid var(--track-border);">
+                                <button class="btn btn-sm w-100 fw-bold" style="background: var(--track-surface-high); color: var(--track-text); border: 1px solid var(--track-border); border-radius: 8px;" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard me-2"></i>Copiar Guía</button>
                                 <template x-if="o.tracking">
-                                    <a :href="o.tracking" target="_blank" class="btn btn-sm w-100 fw-bold" style="background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 8px;">Rastrear</a>
+                                    <a :href="o.tracking" target="_blank" class="btn btn-sm w-100 fw-bold" style="background: rgba(var(--track-primary-rgb, 0, 240, 255), 0.1); color: var(--track-primary); border: 1px solid rgba(var(--track-primary-rgb, 0, 240, 255), 0.3); border-radius: 8px;">Rastrear</a>
                                 </template>
                             </div>
                         </div>
@@ -517,7 +515,7 @@ $noFormErr = $formError === null || $formError === '';
             <!-- Controles de Paginación -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4 mb-5" x-show="filtered.length > 0">
                 <div class="text-secondary small">
-                    Mostrando <span class="fw-bold text-dark" x-text="((page-1)*pageSize)+1"></span> a <span class="fw-bold text-dark" x-text="Math.min(page*pageSize, filtered.length)"></span> de <span class="fw-bold" x-text="filtered.length"></span> resultados.
+                    Mostrando <span class="fw-bold" style="color: var(--track-text);" x-text="((page-1)*pageSize)+1"></span> a <span class="fw-bold" style="color: var(--track-text);" x-text="Math.min(page*pageSize, filtered.length)"></span> de <span class="fw-bold" x-text="filtered.length"></span> resultados.
                 </div>
                 <nav aria-label="Paginación">
                     <ul class="pagination mb-0 track-pagination">

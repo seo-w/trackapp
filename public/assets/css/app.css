@@ -10,8 +10,19 @@
     --track-muted: #94a3b8;
     --track-primary: #00ffff; /* Cyan Puro */
     --track-secondary: #d674ff;
+    --track-success: #20c997;
+    --track-warning: #ffb800;
+    --track-danger: #ff24e4;
+    --track-info: #00d2ff;
     --track-accent-glow: rgba(0, 255, 255, 0.2);
     --track-blur: blur(20px);
+    
+    /* Elements */
+    --track-card-bg: rgba(45, 53, 70, 0.4);
+    --track-card-alt: rgba(255, 255, 255, 0.02);
+    --track-table-color: #dbe2f8;
+    --track-table-head: #b9cacb;
+    --track-hover-bg: rgba(0, 240, 255, 0.05);
 
     /* UI Spacing Scale (UX Rhythm) */
     --track-spacer-1: 0.25rem;
@@ -33,11 +44,22 @@
     --track-surface-high: #ffffff;
     --track-border: rgba(13, 110, 253, 0.1);
     --track-text: #1e293b;
-    --track-muted: #64748b;
+    --track-muted: #475569;
     --track-primary: #0d6efd; /* Bootstrap blue for light mode */
     --track-secondary: #6366f1;
+    --track-success: #198754;
+    --track-warning: #f59e0b;
+    --track-danger: #e11d48;
+    --track-info: #0ea5e9;
     --track-accent-glow: rgba(13, 110, 253, 0.1);
     --track-blur: blur(10px);
+    
+    /* Elements */
+    --track-card-bg: rgba(255, 255, 255, 0.5);
+    --track-card-alt: rgba(248, 250, 252, 0.8);
+    --track-table-color: #1e293b;
+    --track-table-head: #334155;
+    --track-hover-bg: rgba(13, 110, 253, 0.05);
 }
 
 html {
@@ -219,7 +241,19 @@ p, span, label, td, th {
 
 [data-theme="light"] .track-card {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+[data-theme="light"] .track-nav-link.active {
+    color: var(--track-primary) !important;
+    background: var(--track-hover-bg) !important;
+}
+
+[data-theme="light"] table thead th,
+[data-theme="light"] .table-premium thead th {
+    background: var(--track-surface-high) !important;
+    color: var(--track-table-head) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .track-page-title {
@@ -256,12 +290,17 @@ p, span, label, td, th {
 
 [data-theme="light"] .form-control, [data-theme="light"] .form-select {
     background-color: #fff !important;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
     color: #1e293b !important;
 }
 
+[data-theme="light"] .form-control:focus, [data-theme="light"] .form-select:focus {
+    border-color: var(--track-primary) !important;
+    box-shadow: 0 0 0 4px var(--track-hover-bg) !important;
+}
+
 [data-theme="light"] .form-control::placeholder {
-    color: #94a3b8 !important;
+    color: #64748b !important;
 }
 
 .btn-outline-secondary {
@@ -290,6 +329,7 @@ p, span, label, td, th {
 /* Data Tables: Crystal Panels */
 .table-premium {
     color: var(--track-text);
+    background-color: transparent !important;
 }
 
 .table-premium thead th {
@@ -301,6 +341,10 @@ p, span, label, td, th {
     letter-spacing: 1.5px;
     font-weight: 800;
     border-bottom: 2px solid var(--track-border);
+}
+
+.table-premium tbody, .table-premium tr, .table-premium td {
+    background: transparent !important;
 }
 
 .table-premium tbody td {
@@ -344,9 +388,13 @@ p, span, label, td, th {
 
 .nav-pills-stats .nav-link.active {
     background: var(--track-primary) !important;
-    color: #0a0e16 !important;
+    color: var(--track-bg) !important;
     border-color: var(--track-primary);
     box-shadow: 0 0 20px var(--track-accent-glow);
+}
+
+[data-theme="light"] .nav-pills-stats .nav-link.active {
+    color: #ffffff !important;
 }
 
 /* Layout Hacks: Asymmetry */
@@ -368,8 +416,9 @@ p, span, label, td, th {
 /* Footer: Shadow Layer */
 .track-footer {
     border-top: 1px solid var(--track-border);
-    background: rgba(10, 14, 22, 0.9);
-    backdrop-filter: blur(10px);
+    background: var(--track-surface);
+    backdrop-filter: var(--track-blur);
+    -webkit-backdrop-filter: var(--track-blur);
 }
 
 /* Skeleton Glow */
@@ -420,9 +469,9 @@ p, span, label, td, th {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(0, 255, 255, 0.1);
+    background: var(--track-hover-bg);
     color: var(--track-primary);
-    border: 1px solid rgba(0, 255, 255, 0.2);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.2);
+    box-shadow: 0 0 10px var(--track-accent-glow);
 }
 

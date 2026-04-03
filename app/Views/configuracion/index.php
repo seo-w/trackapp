@@ -75,9 +75,9 @@ $errTienda = $errors['tienda_id'] ?? null;
                                 type="url"
                                 name="api_base_url"
                                 id="api_base_url"
-                                class="form-control form-control-lg bg-dark bg-opacity-25 border-secondary border-opacity-25 text-white <?= $errApi ? 'is-invalid' : '' ?>"
+                                class="form-control form-control-lg <?= $errApi ? 'is-invalid' : '' ?>"
                                 x-model="apiUrl"
-                                style="border-radius: 12px;"
+                                style="border-radius: 12px; background: var(--track-surface-high); border-color: var(--track-border); color: var(--track-text);"
                                 placeholder="https://api.ejemplo.com"
                                 maxlength="512"
                                 required
@@ -112,9 +112,9 @@ $errTienda = $errors['tienda_id'] ?? null;
                                     :type="show ? 'text' : 'password'"
                                     name="access_token"
                                     id="access_token"
-                                    class="form-control font-monospace bg-dark bg-opacity-25 border-secondary border-opacity-25 text-white"
+                                    class="form-control font-monospace"
                                     value=""
-                                    style="border-radius: 12px 0 0 12px;"
+                                    style="border-radius: 12px 0 0 12px; background: var(--track-surface-high); border-color: var(--track-border); color: var(--track-text);"
                                     autocomplete="new-password"
                                     placeholder="<?= $has_stored_token ? 'Dejar vacío para conservar token' : 'Pega el token aquí' ?>"
                                     aria-describedby="access_token_help token_toggle_label"
@@ -142,7 +142,7 @@ $errTienda = $errors['tienda_id'] ?? null;
                             <div>
                                 <h2 class="h6 mb-1">Prueba de conexión</h2>
                                 <p class="text-secondary small mb-0">
-                                    Envía una petición real <span class="text-nowrap">GET <code>/ordenes/find</code></span> con <code>estado=2</code> usando la configuración <strong>ya guardada</strong>. No muestra el token.
+                                    Envía una petición real <span class="text-nowrap">GET <code style="color: var(--track-info)">/ordenes/find</code></span> con <code style="color: var(--track-info)">estado=2</code> usando la configuración <strong>ya guardada</strong>. No muestra el token.
                                 </p>
                             </div>
                             <button type="submit" class="btn btn-outline-secondary flex-shrink-0">
