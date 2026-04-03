@@ -21,7 +21,7 @@ final class AppSettingsRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, api_base_url, tienda_id, access_token_encrypted, created_at, updated_at
+            'SELECT id, api_base_url, tienda_id, tienda_name, access_token_encrypted, created_at, updated_at
              FROM app_settings WHERE id = :id LIMIT 1',
         );
         $stmt->execute(['id' => $id]);
@@ -35,13 +35,23 @@ final class AppSettingsRepository
      */
     public function first(): ?array
     {
-        $stmt = $this->pdo->query(
-            'SELECT id, api_base_url, tienda_id, access_token_encrypted, created_at, updated_at
-             FROM app_settings ORDER BY id ASC LIMIT 1',
-        );
-        $row = $stmt->fetch();
+        try {
+            $stmt = $this->pdo->query(
+                'SELECT id, api_base_url, tienda_id, tienda_name, access_token_encrypted, created_at, updated_at
+                 FROM app_settings ORDER BY id ASC LIMIT 1',
+            );
+            $row = $stmt->fetch();
 
-        return $row === false ? null : $row;
+            return $row === false ? null : $row;
+        } catch (\PDOException $e) {
+            // Si falta la columna (migración pendiente), intentamos añadirla al vuelo
+            if (str_contains($e->getMessage(), 'no such column: tienda_name')) {
+                $this->pdo->exec('ALTER TABLE app_settings ADD COLUMN tienda_name VARCHAR(255) DEFAULT ""');
+                
+                return $this->first();
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -72,12 +82,13 @@ final class AppSettingsRepository
         }
 
         $stmt = $this->pdo->prepare(
-            'INSERT INTO app_settings (api_base_url, tienda_id, access_token_encrypted)
-             VALUES (:api_base_url, :tienda_id, :access_token_encrypted)',
+            'INSERT INTO app_settings (api_base_url, tienda_id, tienda_name, access_token_encrypted)
+             VALUES (:api_base_url, :tienda_id, :tienda_name, :access_token_encrypted)',
         );
         $stmt->execute([
             'api_base_url' => '',
             'tienda_id' => '',
+            'tienda_name' => '',
             'access_token_encrypted' => null,
         ]);
 
@@ -100,6 +111,7 @@ final class AppSettingsRepository
             'UPDATE app_settings
              SET api_base_url = :api_base_url,
                  tienda_id = :tienda_id,
+                 tienda_name = :tienda_name,
                  access_token_encrypted = :access_token_encrypted,
                  updated_at = CURRENT_TIMESTAMP
              WHERE id = :id',
@@ -108,6 +120,7 @@ final class AppSettingsRepository
             'id' => $id,
             'api_base_url' => $data['api_base_url'],
             'tienda_id' => $data['tienda_id'],
+            'tienda_name' => $data['tienda_name'] ?? '',
             'access_token_encrypted' => $data['access_token_encrypted'],
         ]);
 

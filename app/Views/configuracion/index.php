@@ -60,7 +60,44 @@ $errTienda = $errors['tienda_id'] ?? null;
             </p>
         </div>
     <?php else: ?>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center g-4">
+            <!-- Sync Section -->
+            <div class="col-lg-4">
+                <div class="card track-card p-4 h-100">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="track-icon-circle bg-primary bg-opacity-10 text-primary" style="width: 2.5rem; height: 2.5rem; font-size: 1.1rem;">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <h2 class="h5 mb-0">Sincronización</h2>
+                    </div>
+                    <p class="text-secondary small mb-4">
+                        Inicia sesión con tu cuenta de Merkaweb para capturar automáticamente el **Token de Acceso** y el **ID de tu Tienda**.
+                    </p>
+                    
+                    <form method="post" action="/configuracion/sync">
+                        <?= csrf_field() ?>
+                        <div class="mb-3">
+                            <label for="email" class="form-label small fw-bold text-uppercase opacity-75">Correo Electrónico</label>
+                            <input type="email" name="email" id="email" class="form-control" placeholder="info@ejemplo.org" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label small fw-bold text-uppercase opacity-75">Contraseña</label>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">
+                            <i class="bi bi-cloud-download me-2"></i>Sincronizar Datos
+                        </button>
+                    </form>
+
+                    <div class="mt-4 pt-3 border-top border-secondary border-opacity-10">
+                        <div class="d-flex align-items-center gap-2 text-secondary">
+                            <i class="bi bi-info-circle fs-5"></i>
+                            <span class="small">Esto actualizará tus credenciales guardadas automáticamente.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-lg-8">
                 <div class="card track-card track-card--emphasis p-4 p-md-5">
                     <form method="post" action="/configuracion" class="track-settings-form" autocomplete="off">

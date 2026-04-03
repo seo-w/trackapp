@@ -110,6 +110,42 @@ final class MerkawebService
     }
 
     /**
+     * POST /auth/login con email y password.
+     */
+    public function login(string $email, string $password)
+    {
+        $settings = $this->settingsRepository->first();
+        $baseUrl = $settings ? rtrim($settings['api_base_url'], '/') : 'https://api.merkaweb7.com/api/v1';
+        
+        $url = $baseUrl . '/auth/login';
+        $response = $this->http->post($url, [
+            'email' => $email,
+            'password' => $password
+        ], [
+            'Accept' => 'application/json'
+        ]);
+
+        return $this->interpretHttpResponse($response);
+    }
+
+    /**
+     * GET /auth/getInfoUser con Authorization: Bearer …
+     */
+    public function getInfoUser(string $token)
+    {
+        $settings = $this->settingsRepository->first();
+        $baseUrl = $settings ? rtrim($settings['api_base_url'], '/') : 'https://api.merkaweb7.com/api/v1';
+
+        $url = $baseUrl . '/auth/getInfoUser';
+        $response = $this->http->get($url, [
+            'Authorization' => 'Bearer ' . $token,
+            'Accept' => 'application/json',
+        ]);
+
+        return $this->interpretHttpResponse($response);
+    }
+
+    /**
      * GET /productos/{id} con Authorization: Bearer …
      */
     public function findProductoById($productId)

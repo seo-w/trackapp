@@ -13,4 +13,11 @@ abstract class Controller
     {
         View::render($name, $data);
     }
+
+    protected function requireAuth(): void
+    {
+        if (! session()->has('user_id')) {
+            redirect('/login');
+        }
+    }
 }

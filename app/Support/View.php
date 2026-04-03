@@ -19,6 +19,15 @@ final class View
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
         $data['currentPath'] = $data['currentPath'] ?? $path;
         $data['app'] = $data['app'] ?? Application::getInstance()->get('app', []);
+        
+        $tiendaName = '';
+        try {
+            $row = (new \App\Repositories\AppSettingsRepository(db()->pdo()))->first();
+            if ($row && !empty($row['tienda_name'])) {
+                $tiendaName = $row['tienda_name'];
+            }
+        } catch (\Throwable $e) {}
+        $data['tienda_name'] = $tiendaName;
 
         extract($data, EXTR_SKIP);
 

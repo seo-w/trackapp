@@ -14,6 +14,7 @@ final class StatsController extends Controller
 {
     public function index(): void
     {
+        $this->requireAuth();
         try {
             $pdo = db()->pdo();
             $repo = new AppSettingsRepository($pdo);
@@ -161,6 +162,7 @@ final class StatsController extends Controller
 
     public function savePauta(): void
     {
+        $this->requireAuth();
         if (! csrf_validate()) {
             http_response_code(400);
             echo "Sesión expirada.";

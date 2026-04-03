@@ -15,6 +15,7 @@ final class ConsultasController extends Controller
 {
     public function index(): void
     {
+        $this->requireAuth();
         $this->renderConsultas([
             'selectedStates' => [2, 3, 4, 5],
             'showResults' => false,
@@ -23,6 +24,8 @@ final class ConsultasController extends Controller
 
     public function consultar(): void
     {
+        $this->requireAuth();
+        
         $selectedFromPost = $this->parseEstadosFromPost();
         $fechaDesde = $this->parseDateFromPost('fecha_desde');
         $fechaHasta = $this->parseDateFromPost('fecha_hasta');

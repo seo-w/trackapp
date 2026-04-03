@@ -12,6 +12,7 @@ final class SettingsController extends Controller
 {
     public function index(): void
     {
+        $this->requireAuth();
         /** @var array<string, string> $errors */
         $errors = flash_take('config_errors', []);
         if (! is_array($errors)) {
@@ -55,14 +56,87 @@ final class SettingsController extends Controller
             'errors' => $errors,
             'api_base_url' => $apiDefault,
             'tienda_id' => $tiendaDefault,
+            'tienda_name' => (string) ($row['tienda_name'] ?? ''),
             'has_stored_token' => $row['access_token_encrypted'] !== null && $row['access_token_encrypted'] !== '',
             'flashSuccess' => $flashSuccess,
             'flashError' => $flashError,
         ]);
     }
 
+    public function syncMerkaweb(): void
+    {
+        $this->requireAuth();
+        if (! csrf_validate()) {
+            flash('config_flash_error', 'Token de seguridad inválido.');
+            redirect('/configuracion');
+        }
+
+        $email = trim((string) ($_POST['email'] ?? ''));
+        $password = (string) ($_POST['password'] ?? '');
+
+        if ($email === '' || $password === '') {
+            flash('config_flash_error', 'Email y contraseña son obligatorios para sincronizar.');
+            redirect('/configuracion');
+        }
+
+        try {
+            $pdo = db()->pdo();
+            $repo = new AppSettingsRepository($pdo);
+            $service = MerkawebService::fromApp(config('app'), $repo);
+            
+            // 1. Login
+            $loginRes = $service->login($email, $password);
+            if (!$loginRes->ok) {
+                flash('config_flash_error', 'Error en Login: ' . $loginRes->message);
+                redirect('/configuracion');
+            }
+
+            $token = (string) ($loginRes->data['token'] ?? '');
+            if ($token === '') {
+                flash('config_flash_error', 'No se recibió un token válido del API.');
+                redirect('/configuracion');
+            }
+
+            // 2. Get Info
+            $infoRes = $service->getInfoUser($token);
+            if (!$infoRes->ok) {
+                flash('config_flash_error', 'Error al obtener Info: ' . $infoRes->message);
+                redirect('/configuracion');
+            }
+
+            $tienda = $infoRes->data['data']['tienda'] ?? null;
+            if (!$tienda) {
+                flash('config_flash_error', 'No se encontró información de la tienda vinculada.');
+                redirect('/configuracion');
+            }
+
+            $tiendaId = (string) ($tienda['id'] ?? '');
+            $tiendaName = (string) ($tienda['tienda_name'] ?? 'Tienda Sincronizada');
+
+            // 3. Encrypt and Save
+            $crypt = Crypt::fromAppConfig(config('app'));
+            $encryptedToken = $crypt->encrypt($token);
+            
+            $row = $repo->firstOrCreateEmpty();
+            $repo->update((int) $row['id'], [
+                'api_base_url' => $row['api_base_url'], // Mantener la URL base que ya tenga o usar una por defecto si está vacía
+                'tienda_id' => $tiendaId,
+                'tienda_name' => $tiendaName,
+                'access_token_encrypted' => $encryptedToken
+            ]);
+
+            flash('config_flash_success', "¡Sincronización exitosa! Tienda: $tiendaName");
+            
+        } catch (\Throwable $e) {
+            flash('config_flash_error', 'Error crítico: ' . $e->getMessage());
+        }
+
+        redirect('/configuracion');
+    }
+
     public function save(): void
     {
+        $this->requireAuth();
         if (! csrf_validate()) {
             flash('config_flash_error', 'El token de seguridad del formulario no es válido. Vuelve a cargar la página e inténtalo de nuevo.');
             redirect('/configuracion');
@@ -120,6 +194,7 @@ final class SettingsController extends Controller
             $repo->update((int) $row['id'], [
                 'api_base_url' => $apiNormalized,
                 'tienda_id' => $tienda,
+                'tienda_name' => (string) ($row['tienda_name'] ?? ''),
                 'access_token_encrypted' => $encrypted,
             ]);
             flash('config_flash_success', 'Configuración del API guardada correctamente.');
@@ -132,6 +207,7 @@ final class SettingsController extends Controller
 
     public function testConnection(): void
     {
+        $this->requireAuth();
         if (! csrf_validate()) {
             flash('config_flash_error', 'El token de seguridad del formulario no es válido. Vuelve a cargar la página e inténtalo de nuevo.');
             redirect('/configuracion');
