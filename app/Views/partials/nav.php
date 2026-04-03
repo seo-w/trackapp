@@ -39,6 +39,11 @@ function navActive(string $currentPath, string $route): string
                 <li class="nav-item">
                     <a class="nav-link track-nav-link <?= navActive($path, '/historial') ?>" href="/historial"<?= navActive($path, '/historial') === 'active' ? ' aria-current="page"' : '' ?>>Historial</a>
                 </li>
+                <li class="nav-item ms-lg-2 d-flex align-items-center">
+                    <button id="themeToggle" class="btn btn-link nav-item track-nav-link px-2" title="Cambiar luz del sistema">
+                        <i class="bi bi-moon-stars" id="themeIcon"></i>
+                    </button>
+                </li>
             </ul>
         </div>
     </div>

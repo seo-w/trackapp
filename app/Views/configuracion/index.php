@@ -18,15 +18,21 @@ $errApi = $errors['api_base_url'] ?? null;
 $errTienda = $errors['tienda_id'] ?? null;
 ?>
 <div class="container track-page-header">
-    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3">
-        <div>
-            <h1 class="track-page-title h2 mb-1"><?= $h ?></h1>
-            <p class="track-page-lead mb-0">
-                Define la URL base del API, el identificador de tienda y el token de acceso. El token se guarda cifrado y no se muestra en pantalla.
-            </p>
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="track-icon-circle shadow-lg" style="width: 3.5rem; height: 3.5rem; font-size: 1.5rem;">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <span class="track-pill mb-2"><i class="bi bi-gear-fill"></i> Configuración de Núcleo</span>
+                <h1 class="track-page-title h2 mb-0"><?= $h ?></h1>
+            </div>
         </div>
         <?php if ($has_stored_token && ! $dbUnavailable): ?>
-            <span class="track-pill align-self-start"><i class="bi bi-shield-lock" aria-hidden="true"></i> Token almacenado de forma segura</span>
+            <div class="glow-border-glass p-3 rounded-pill d-flex align-items-center gap-2" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                <i class="bi bi-shield-check text-success fs-5"></i>
+                <span class="small fw-bold text-success uppercase" style="letter-spacing:1px;">Token Encriptado Activo</span>
+            </div>
         <?php endif; ?>
     </div>
 </div>
@@ -69,8 +75,9 @@ $errTienda = $errors['tienda_id'] ?? null;
                                 type="url"
                                 name="api_base_url"
                                 id="api_base_url"
-                                class="form-control form-control-lg <?= $errApi ? 'is-invalid' : '' ?>"
+                                class="form-control form-control-lg bg-dark bg-opacity-25 border-secondary border-opacity-25 text-white <?= $errApi ? 'is-invalid' : '' ?>"
                                 x-model="apiUrl"
+                                style="border-radius: 12px;"
                                 placeholder="https://api.ejemplo.com"
                                 maxlength="512"
                                 required
@@ -78,7 +85,7 @@ $errTienda = $errors['tienda_id'] ?? null;
                             <?php if ($errApi): ?>
                                 <div class="invalid-feedback"><?= htmlspecialchars($errApi, ENT_QUOTES, 'UTF-8') ?></div>
                             <?php endif; ?>
-                            <div class="form-text">Incluye el esquema (<code>https://</code>). Se normaliza quitando la barra final.</div>
+                            <div class="form-text text-muted">Protocolo de enlace seguro requerido (<code>https://</code>).</div>
                         </div>
 
                         <div class="mb-4">
@@ -105,14 +112,14 @@ $errTienda = $errors['tienda_id'] ?? null;
                                     :type="show ? 'text' : 'password'"
                                     name="access_token"
                                     id="access_token"
-                                    class="form-control font-monospace"
+                                    class="form-control font-monospace bg-dark bg-opacity-25 border-secondary border-opacity-25 text-white"
                                     value=""
+                                    style="border-radius: 12px 0 0 12px;"
                                     autocomplete="new-password"
-                                    placeholder="<?= $has_stored_token ? 'Dejar vacío para conservar el token actual' : 'Pega el token aquí' ?>"
+                                    placeholder="<?= $has_stored_token ? 'Dejar vacío para conservar token' : 'Pega el token aquí' ?>"
                                     aria-describedby="access_token_help token_toggle_label"
                                 >
-                                <button class="btn btn-outline-secondary" type="button" @click="show = !show" :aria-pressed="show" aria-labelledby="token_toggle_label">
-                                    <span id="token_toggle_label" class="visually-hidden">Mostrar u ocultar token</span>
+                                <button class="btn btn-outline-secondary border-opacity-25" type="button" @click="show = !show" :aria-pressed="show" aria-labelledby="token_toggle_label">
                                     <i class="bi" :class="show ? 'bi-eye-slash' : 'bi-eye'" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -121,10 +128,10 @@ $errTienda = $errors['tienda_id'] ?? null;
                             </div>
                         </div>
 
-                        <div class="d-flex flex-wrap gap-2 justify-content-end pt-2 border-top mt-4 pt-4">
-                            <a class="btn btn-outline-secondary" href="/">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save me-1" aria-hidden="true"></i>Guardar configuración
+                        <div class="d-flex flex-wrap gap-2 justify-content-end pt-2 border-top border-secondary border-opacity-10 mt-4 pt-4">
+                            <a class="btn btn-link text-muted text-decoration-none fw-bold small px-4" href="/">Abordar Cambio</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                                <i class="bi bi-save me-1" aria-hidden="true"></i>Commit Cambios
                             </button>
                         </div>
                     </form>
