@@ -46,14 +46,23 @@ $lang = htmlspecialchars((string) ($app['locale'] ?? 'es'), ENT_QUOTES, 'UTF-8')
 <body>
     <a class="visually-hidden-focusable position-absolute top-0 start-0 p-3 m-2 bg-body shadow-sm rounded text-decoration-none z-3" href="#main-content">Saltar al contenido principal</a>
 
-    <?php require BASE_PATH . '/app/Views/partials/nav.php'; ?>
+    <?php 
+    $isApproved = session()->get('user_approved', false);
+    $isAuth = session()->has('user_id');
+    ?>
+
+    <?php if ($isAuth && $isApproved): ?>
+        <?php require BASE_PATH . '/app/Views/partials/nav.php'; ?>
+    <?php endif; ?>
 
     <main id="main-content" tabindex="-1">
         <?= $content ?>
     </main>
 
-    <?php require BASE_PATH . '/app/Views/partials/footer.php'; ?>
-    <?php require BASE_PATH . '/app/Views/partials/toasts.php'; ?>
+    <?php if ($isAuth && $isApproved): ?>
+        <?php require BASE_PATH . '/app/Views/partials/footer.php'; ?>
+        <?php require BASE_PATH . '/app/Views/partials/toasts.php'; ?>
+    <?php endif; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 

@@ -20,7 +20,9 @@ final class StatsController extends Controller
             $repo = new AppSettingsRepository($pdo);
             $merkaweb = MerkawebService::fromApp(config('app'), $repo);
             $queryService = new OrderListQueryService($merkaweb);
-            // Traemos todos los estados importantes (2, 3, 4, 5) sin filtro de fecha para agrupar por mes
+            
+            // Traemos todos los estados importantes (2, 3, 4, 5)
+            // findOrdenesByEstado ya usa tienda_id de la sesión internamente ahora.
             $out = $queryService->fetchAndNormalize([2, 3, 4, 5]);
             $orders = $out['orders'];
 
@@ -33,9 +35,10 @@ final class StatsController extends Controller
             $pIds = array_keys($detailedStats['productStats'] ?? []);
             $products = $productService->getMultiple($pIds);
 
-            // Cargar gastos de publicidad
+            // Cargar gastos de publicidad (FILTRADOS POR TIENDA)
             $adRepo = new AdSpendRepository($pdo);
-            $pautas = $adRepo->all();
+            $tiendaId = (string) session()->get('tienda_id', 'global');
+            $pautas = $adRepo->all($tiendaId);
 
             /** @var array<string, array<string, mixed>> $grouped */
             $grouped = [];
@@ -171,11 +174,12 @@ final class StatsController extends Controller
 
         $mes = $_POST['mes'] ?? '';
         $amountRaw = $_POST['amount'] ?? '0';
+        $tiendaId = (string) session()->get('tienda_id', 'global');
 
         if (is_string($mes) && preg_match('/^\d{4}-\d{2}$/', $mes)) {
             $amount = (float) $amountRaw;
             $adRepo = new AdSpendRepository(db()->pdo());
-            $adRepo->save($mes, $amount);
+            $adRepo->save($tiendaId, $mes, $amount);
         }
 
         // Redirigir de vuelta a estadísticas

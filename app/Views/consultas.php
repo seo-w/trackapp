@@ -77,29 +77,56 @@ $noFormErr = $formError === null || $formError === '';
 <style>
     .track-filter-bar {
         background: var(--track-surface);
-        backdrop-filter: var(--track-blur);
-        -webkit-backdrop-filter: var(--track-blur);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid var(--track-border);
-        border-radius: 16px;
+        border-radius: 24px;
         padding: 2.5rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
     }
+    
+    [data-theme="light"] .track-filter-bar {
+        background: #ffffff;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        border-color: #e2e8f0;
+    }
+
     .track-input-group {
         position: relative;
         display: flex;
         align-items: center;
         background: var(--track-surface-high);
-        border: none;
-        border-bottom: 2px solid var(--track-border);
-        border-radius: 8px 8px 0 0;
-        padding: 0.8rem 1rem;
-        transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--track-border);
+        border-radius: 12px;
+        padding: 0.8rem 1.25rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
+    [data-theme="light"] .track-input-group {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
     .track-input-group:focus-within {
-        border-bottom-color: var(--track-primary);
+        border-color: var(--track-primary);
         background: var(--track-hover-bg);
-        box-shadow: 0 10px 15px -5px var(--track-accent-glow);
+        box-shadow: 0 0 15px rgba(var(--track-primary-rgb), 0.15);
+        transform: translateY(-1px);
     }
+
+    .track-control-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--track-muted);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    [data-theme="light"] .track-control-label { color: #64748b; }
+    
     .track-input-group .form-control {
         border: none !important;
         background: transparent !important;
@@ -118,6 +145,7 @@ $noFormErr = $formError === null || $formError === '';
         display: block;
         opacity: 0.7;
     }
+
     /* Estados como Chips Futuristas */
     .track-status-pill {
         display: inline-flex;

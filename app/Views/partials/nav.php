@@ -44,6 +44,11 @@ function navActive(string $currentPath, string $route): string
                 <li class="nav-item">
                     <a class="nav-link track-nav-link <?= navActive($path, '/historial') ?>" href="/historial"<?= navActive($path, '/historial') === 'active' ? ' aria-current="page"' : '' ?>>Historial</a>
                 </li>
+                <?php if (session()->get('user_role') === 'admin' || session()->get('user_role') === 'superadmin'): ?>
+                    <li class="nav-item">
+                        <a class="nav-link track-nav-link <?= navActive($path, '/usuarios') ?>" href="/usuarios"<?= navActive($path, '/usuarios') === 'active' ? ' aria-current="page"' : '' ?>>Usuarios</a>
+                    </li>
+                <?php endif; ?>
                 <?php if (session()->has('user_id')): ?>
                     <li class="nav-item ms-lg-2">
                         <form action="/logout" method="post" class="d-inline">

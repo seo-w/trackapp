@@ -15,28 +15,83 @@ declare(strict_types=1);
 <div class="container pb-5">
 
 <style>
-    html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+    :root {
+        --track-stats-accent: #00ffff;
+        --track-stats-glow: rgba(0, 255, 255, 0.2);
+    }
+    html { scroll-behavior: smooth; scroll-padding-top: 120px; }
+    
     .sticky-nav-stats {
         position: sticky;
         top: 72px; 
         z-index: 1020;
         background: var(--track-surface);
-        backdrop-filter: var(--track-blur);
-        -webkit-backdrop-filter: var(--track-blur);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
         border-bottom: 1px solid var(--track-border);
-        margin-bottom: var(--track-spacer-4);
-        padding: var(--track-spacer-2) 0;
+        margin-bottom: 2rem;
+        padding: 0.75rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
+
+    .nav-pills-stats .nav-link {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--track-muted);
+        border-radius: 50px;
+        padding: 0.5rem 1.25rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+    }
+
+    .nav-pills-stats .nav-link:hover {
+        color: var(--track-primary);
+        background: rgba(var(--track-primary-rgb), 0.05);
+    }
+
+    .nav-pills-stats .nav-link.active {
+        background: var(--track-primary) !important;
+        color: #000 !important;
+        box-shadow: 0 0 20px var(--track-stats-glow);
+        transform: translateY(-2px);
+    }
+
+    .stats-card-premium {
+        background: var(--track-surface);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--track-border);
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .stats-card-premium:hover {
+        transform: translateY(-5px);
+        border-color: rgba(var(--track-primary-rgb), 0.3);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+
+    .glass-metric {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+    }
+
+    [data-theme="light"] .sticky-nav-stats {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: #dee2e6;
+    }
+    
+    [data-theme="light"] .nav-pills-stats .nav-link { color: #64748b; }
+    [data-theme="light"] .stats-card-premium { background: #ffffff; border-color: #e2e8f0; }
+
     .stats-grid {
         display: grid;
-        gap: var(--track-spacer-4);
+        gap: 1.5rem;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    }
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-            gap: var(--track-spacer-3);
-        }
     }
 </style>
 
@@ -93,9 +148,12 @@ declare(strict_types=1);
     <?php endif; ?>
 
     <?php if (!isset($months) || $months === []): ?>
-        <div class="alert alert-light border text-center p-5 text-secondary">
-            <i class="bi bi-bar-chart fs-1 d-block mb-3"></i>
-            <p class="mb-0">No hay información suficiente para generar estadísticas. <br>Asegúrate de tener órdenes creadas y el API de Merkaweb configurado correctamente.</p>
+        <div class="stats-card-premium text-center p-5 border-dashed" style="border: 2px dashed var(--track-border) !important; background: rgba(var(--track-primary-rgb), 0.02);">
+            <div class="mb-4">
+                <i class="bi bi-bar-chart fs-1" style="color: var(--track-primary); filter: drop-shadow(0 0 10px var(--track-stats-glow));"></i>
+            </div>
+            <h4 class="fw-bold mb-2" style="color: var(--track-text);">Sin datos para mostrar</h4>
+            <p class="mb-0 mx-auto opacity-75" style="max-width: 500px; color: var(--track-muted);">No hay información suficiente para generar estadísticas en este periodo. Asegúrate de tener órdenes creadas y el API de Merkaweb configurado correctamente en tu perfil.</p>
         </div>
     <?php else: ?>
         <?php

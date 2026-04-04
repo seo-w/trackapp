@@ -189,6 +189,19 @@ final class MerkawebService
             );
         }
 
+        // Prioridad 1: Credenciales en sesión (Usuario logueado individualmente)
+        $sessionTienda = session()->get('tienda_id');
+        $sessionToken  = session()->get('merkaweb_token');
+
+        if (!empty($sessionTienda) && !empty($sessionToken)) {
+            return [
+                'api_base_url' => rtrim($base, '/'),
+                'tienda_id' => (string) $sessionTienda,
+                'token' => (string) $sessionToken,
+            ];
+        }
+
+        // Prioridad 2: Credenciales globales (Configuración manual)
         $tienda = trim((string) ($row['tienda_id'] ?? ''));
         if ($tienda === '') {
             return MerkawebResult::fail(

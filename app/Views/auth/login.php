@@ -247,22 +247,46 @@ $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
                 <div class="d-flex justify-content-between">
                     <label for="password" class="form-label small text-uppercase fw-bold opacity-50 px-2 mb-2">Contraseña</label>
                 </div>
-                <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required>
+                <div class="input-group">
+                    <input type="password" name="password" id="password" class="form-control border-end-0" style="border-radius: 16px 0 0 16px;" placeholder="••••••••" required>
+                    <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword" style="border-radius: 0 16px 16px 0; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);">
+                        <i class="bi bi-eye-fill" id="eyeIcon"></i>
+                    </button>
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-login">
+            <button type="submit" class="btn btn-login mb-4">
                 <span>Acceder al Sistema</span>
                 <i class="bi bi-arrow-right ms-2"></i>
             </button>
+
+            <div class="text-center">
+                <a href="/recovery" class="text-secondary text-decoration-none small opacity-75 hover-opacity-100">
+                    <i class="bi bi-shield-lock me-1"></i> ¿Olvidaste tus datos? (Admin)
+                </a>
+            </div>
         </form>
 
-        <div class="footer-text">
+        <div class="footer-text mt-5">
             <span class="glow-dot"></span> Acceso Seguro Protegido por Token Merkaweb
         </div>
     </div>
 
     <!-- Particles Background Logic (Optional visual enhancement) -->
     <script>
+        // Toggle password visibility
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                eyeIcon.className = type === 'password' ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill';
+            });
+        }
+
         // Smooth transition effect
         document.querySelector('form').addEventListener('submit', function() {
             document.querySelector('.login-card').style.opacity = '0.5';
