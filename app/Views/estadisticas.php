@@ -117,7 +117,8 @@ declare(strict_types=1);
                 <a class="nav-link" href="#section-logistics-global" :class="{ 'active': activeSection === 'section-logistics-global' }"><i class="bi bi-globe2 me-1"></i> Global</a>
                 <a class="nav-link" href="#section-monthly-logistics" :class="{ 'active': activeSection === 'section-monthly-logistics' }"><i class="bi bi-calendar3 me-1"></i> Mensual Logística</a>
                 <a class="nav-link" href="#section-success-cities" :class="{ 'active': activeSection === 'section-success-cities' }"><i class="bi bi-star-fill me-1"></i> Éxito Ciudades</a>
-                <a class="nav-link" href="#section-return-cities" :class="{ 'active': activeSection === 'section-return-cities' }"><i class="bi bi-geo-fill me-1"></i> Devoluciones</a>
+                <a class="nav-link" href="#section-return-cities" :class="{ 'active': activeSection === 'section-return-cities' }"><i class="bi bi-geo-fill me-1"></i> Devoluciones Ciudad</a>
+                <a class="nav-link" href="#section-return-courier" :class="{ 'active': activeSection === 'section-return-courier' }"><i class="bi bi-truck me-1"></i> Devoluciones Courier</a>
                 <a class="nav-link" href="#section-products" :class="{ 'active': activeSection === 'section-products' }"><i class="bi bi-box-seam me-1"></i> Productos</a>
                 <a class="nav-link" href="#section-financial-summary" :class="{ 'active': activeSection === 'section-financial-summary' }"><i class="bi bi-graph-up-arrow me-1"></i> Finanzas Global</a>
                 <a class="nav-link" href="#section-monthly-details" :class="{ 'active': activeSection === 'section-monthly-details' }"><i class="bi bi-cash-stack me-1"></i> Detalle Mensual</a>
@@ -297,7 +298,7 @@ declare(strict_types=1);
 
             <!-- Ciudades con más Devoluciones -->
             <?php if (!empty($detailedStats['returnsByCity'])): ?>
-                <div class="card track-card border-0 shadow-sm mb-5" id="section-return-cities">
+                <div class="card track-card border-0 shadow-sm mb-4" id="section-return-cities">
 
                     <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
                         <h5 class="card-title fw-bold mb-0" style="color: var(--track-text);"><i class="bi bi-geo-fill me-2" style="color: var(--track-danger);"></i>Ciudades con más Devoluciones</h5>
@@ -318,6 +319,47 @@ declare(strict_types=1);
                                             <span class="fw-semibold text-truncate" style="color: var(--track-text); max-width: 150px;"><?= htmlspecialchars($city, ENT_QUOTES, 'UTF-8') ?></span>
                                         </div>
                                         <span class="badge rounded-pill px-3 py-2" style="background: rgba(var(--track-danger-rgb, 255, 36, 228), 0.2); color: var(--track-danger); border: 1px solid var(--track-danger);"><?= $count ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Devoluciones por Transportadora -->
+            <?php if (!empty($detailedStats['courierStats'])): ?>
+                <div class="card track-card border-0 shadow-sm mb-5" id="section-return-courier">
+
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+                        <h5 class="card-title fw-bold mb-0" style="color: var(--track-text);"><i class="bi bi-truck me-2" style="color: var(--track-warning);"></i>Devoluciones por Transportadora</h5>
+                        <p class="small mb-0 mt-1" style="color: var(--track-muted);">Análisis de efectividad segmentado por empresa de mensajería (Devoluciones vs Total de envíos).</p>
+                    </div>
+                    <div class="card-body px-4 pb-4">
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                            <?php 
+                            foreach ($detailedStats['courierStats'] as $courier => $data): 
+                            ?>
+                                <div class="col">
+                                    <div class="card track-card p-3 h-100" style="background: var(--track-card-bg); border: 1px solid var(--track-border);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(var(--track-warning-rgb, 255, 184, 0), 0.1);">
+                                                    <i class="bi bi-box-seam small" style="color: var(--track-warning);" aria-hidden="true"></i>
+                                                </div>
+                                                <span class="fw-bold text-truncate" style="color: var(--track-text); max-width: 150px;"><?= htmlspecialchars($courier, ENT_QUOTES, 'UTF-8') ?></span>
+                                            </div>
+                                            <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-20"><?= $data['pct'] ?>% devol.</span>
+                                        </div>
+                                        
+                                        <div class="progress mb-3" style="height: 6px; background: rgba(var(--track-warning-rgb, 255, 184, 0), 0.1);">
+                                            <div class="progress-bar bg-warning shadow-glow" role="progressbar" style="width: <?= $data['pct'] ?>%"></div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
+                                            <span>Devueltos: <strong style="color: var(--track-text);"><?= $data['returns'] ?></strong></span>
+                                            <span>Total: <strong style="color: var(--track-text);"><?= $data['total'] ?></strong></span>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
