@@ -11,6 +11,7 @@ final class AdSpendRepository
 {
     public function __construct(private PDO $pdo)
     {
+        $this->pdo->exec('PRAGMA busy_timeout = 5000');
     }
 
     /**
@@ -63,28 +64,44 @@ final class AdSpendRepository
     private function ensureTableExists(): void
     {
         try {
-            $this->pdo->query('SELECT tienda_id FROM ad_spends LIMIT 1');
-        } catch (PDOException $e) {
-            if (str_contains($e->getMessage(), 'no such table')) {
+            // Verificamos si la tabla existe y tiene el índice único correcto
+            $res = $this->pdo->query("SELECT sql FROM sqlite_master WHERE name='ad_spends'")->fetch();
+            if (!$res) {
                 $this->pdo->exec('
                     CREATE TABLE IF NOT EXISTS ad_spends (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         mes VARCHAR(7),
-                        tienda_id VARCHAR(50),
+                        tienda_id VARCHAR(50) DEFAULT "global",
                         amount REAL DEFAULT 0,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         UNIQUE(mes, tienda_id)
                     )
                 ');
-            } elseif (str_contains($e->getMessage(), 'no such column: tienda_id')) {
-                // Migración suave: añadir columna y cambiar el índice único
-                $this->pdo->exec('ALTER TABLE ad_spends ADD COLUMN tienda_id VARCHAR(50) DEFAULT "global"');
-                // En SQLite no podemos cambiar UNIQUE fácilmente sin recrear placa, 
-                // pero por ahora podemos manejarlo o recrear si es necesario.
-                // Como es una app nueva, podemos permitirnos recrearlo si detectamos inconsistencia.
-            } else {
-                throw $e;
+                return;
+            }
+
+            $sql = $res['sql'];
+            // Si la tabla existe pero no tiene el índice compuesto (mes, tienda_id), forzamos migración rápida
+            if (!str_contains($sql, 'UNIQUE(mes, tienda_id)') && !str_contains($sql, 'UNIQUE (mes, tienda_id)')) {
+                 // Esta parte ya debería haber sido manejada por la migración manual, 
+                 // pero la dejamos aquí como fallback seguro
+                 $this->pdo->exec("ALTER TABLE ad_spends ADD COLUMN tienda_id VARCHAR(50) DEFAULT 'global'");
+            }
+        } catch (PDOException $e) {
+            // Si hay un error al consultar sqlite_master, intentamos crear la tabla por si acaso
+            if (str_contains($e->getMessage(), 'no such table')) {
+                 $this->pdo->exec('
+                    CREATE TABLE IF NOT EXISTS ad_spends (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        mes VARCHAR(7),
+                        tienda_id VARCHAR(50) DEFAULT "global",
+                        amount REAL DEFAULT 0,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        UNIQUE(mes, tienda_id)
+                    )
+                ');
             }
         }
     }
