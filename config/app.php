@@ -44,5 +44,6 @@ return [
     'merkaweb' => [
         'http_timeout' => (float) (getenv('MERKAWEB_HTTP_TIMEOUT') ?: 15),
         'http_connect_timeout' => (float) (getenv('MERKAWEB_HTTP_CONNECT_TIMEOUT') ?: 5),
+        'ssl_verify' => filter_var(getenv('MERKAWEB_SSL_VERIFY') ?: false, FILTER_VALIDATE_BOOLEAN),
     ],
 ];

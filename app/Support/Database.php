@@ -12,13 +12,18 @@ use PDOException;
  */
 final class Database
 {
-    private ?PDO $pdo = null;
+    /** @var PDO|null */
+    private $pdo = null;
+
+    /** @var array */
+    private $config;
 
     /**
      * @param array<string, mixed> $config Típicamente config/database.php
      */
-    private function __construct(private array $config)
+    private function __construct(array $config)
     {
+        $this->config = $config;
     }
 
     /**
@@ -26,7 +31,7 @@ final class Database
      *
      * @param array<string, mixed> $config
      */
-    public static function fromConfig(array $config): self
+    public static function fromConfig(array $config)
     {
         return new self($config);
     }
@@ -36,12 +41,12 @@ final class Database
      *
      * @param array<string, mixed> $config
      */
-    public static function connectForMigration(array $config): self
+    public static function connectForMigration(array $config)
     {
         return self::fromConfig($config);
     }
 
-    public function pdo(): PDO
+    public function pdo()
     {
         if ($this->pdo instanceof PDO) {
             return $this->pdo;
@@ -55,22 +60,22 @@ final class Database
     /**
      * @param array<string, mixed> $config
      */
-    private function open(array $config): PDO
+    private function open(array $config)
     {
-        $driver = (string) ($config['driver'] ?? 'mysql');
+        $driver = (string) (isset($config['driver']) ? $config['driver'] : 'mysql');
         if ($driver !== 'mysql' && $driver !== 'sqlite') {
             throw new \InvalidArgumentException(sprintf(
                 'Driver no soportado: %s. Usa mysql o sqlite en config/database.php.',
-                $driver,
+                $driver
             ));
         }
 
-        $host = (string) ($config['host'] ?? '127.0.0.1');
-        $port = (int) ($config['port'] ?? 3306);
-        $database = (string) ($config['database'] ?? '');
-        $charset = (string) ($config['charset'] ?? 'utf8mb4');
-        $username = (string) ($config['username'] ?? '');
-        $password = (string) ($config['password'] ?? '');
+        $host = (string) (isset($config['host']) ? $config['host'] : '127.0.0.1');
+        $port = (int) (isset($config['port']) ? $config['port'] : 3306);
+        $database = (string) (isset($config['database']) ? $config['database'] : '');
+        $charset = (string) (isset($config['charset']) ? $config['charset'] : 'utf8mb4');
+        $username = (string) (isset($config['username']) ? $config['username'] : '');
+        $password = (string) (isset($config['password']) ? $config['password'] : '');
 
         if ($database === '') {
             throw new \InvalidArgumentException('Falta database.name (DB_DATABASE) en la configuración.');
@@ -87,7 +92,7 @@ final class Database
                 $host,
                 $port,
                 $database,
-                $charset,
+                $charset
             );
         }
 
@@ -98,7 +103,7 @@ final class Database
             PDO::ATTR_EMULATE_PREPARES => false,
         ];
         /** @var array<int, mixed> $extra */
-        $extra = $config['options'] ?? [];
+        $extra = isset($config['options']) ? $config['options'] : [];
         /** @var array<int, mixed> $options */
         $options = $extra + $baseOptions;
 
@@ -108,7 +113,7 @@ final class Database
             throw new \RuntimeException(
                 'No se pudo conectar a la base de datos. Revisa host, puerto, credenciales y que el servicio esté en ejecución.',
                 0,
-                $e,
+                $e
             );
         }
     }
@@ -117,12 +122,17 @@ final class Database
      * Ejecuta un fichero SQL dividido por punto y coma (sin ORM).
      * Omite comentarios de línea `--` y bloques vacíos.
      */
-    public static function runSqlFile(PDO $pdo, string $sql): int
+    public static function runSqlFile(PDO $pdo, $sql)
     {
-        $clean = preg_replace('/^\s*--.*$/m', '', $sql) ?? '';
+        $clean = preg_replace('/^\s*--.*$/m', '', $sql);
+        if ($clean === null) {
+            $clean = '';
+        }
         $chunks = array_filter(
             array_map('trim', explode(';', $clean)),
-            static fn (string $chunk): bool => $chunk !== '',
+            function ($chunk) {
+                return $chunk !== '';
+            }
         );
 
         $count = 0;

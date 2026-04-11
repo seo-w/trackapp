@@ -76,84 +76,148 @@ $noFormErr = $formError === null || $formError === '';
 ?>
 <style>
     .track-filter-bar {
-        background: #fff;
+        background: var(--track-surface);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid var(--track-border);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
     }
+    
+    [data-theme="light"] .track-filter-bar {
+        background: #ffffff;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        border-color: #e2e8f0;
+    }
+
     .track-input-group {
         position: relative;
         display: flex;
         align-items: center;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.6rem;
-        padding: 0.5rem 0.75rem;
-        transition: all 0.2s;
+        background: var(--track-surface-high);
+        border: 1px solid var(--track-border);
+        border-radius: 12px;
+        padding: 0.8rem 1.25rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
+    [data-theme="light"] .track-input-group {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
     .track-input-group:focus-within {
-        border-color: var(--track-accent);
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        border-color: var(--track-primary);
+        background: var(--track-hover-bg);
+        box-shadow: 0 0 15px rgba(var(--track-primary-rgb), 0.15);
+        transform: translateY(-1px);
+    }
+
+    .track-control-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--track-muted);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    [data-theme="light"] .track-control-label { color: #64748b; }
+    
+    .track-input-group .form-control {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        height: auto !important;
+        color: var(--track-text) !important;
+        padding-left: 0.5rem !important;
     }
     .track-label-mini {
         font-size: 0.65rem;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
-        color: #94a3b8;
-        margin-bottom: 0.4rem;
+        color: var(--track-table-head);
+        letter-spacing: 0.1em;
+        margin-bottom: 0.8rem;
         display: block;
+        opacity: 0.7;
     }
-    /* Estados como Chips/Tags */
+
+    /* Estados como Chips Futuristas */
     .track-status-pill {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 2rem;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        color: #64748b;
+        gap: 0.4rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 9999px;
+        background: var(--track-card-bg);
+        border: 1px solid var(--track-border);
+        color: var(--track-muted);
         cursor: pointer;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.2s;
+        font-weight: 500;
+        font-size: 1rem; /* 16px */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
     }
-    .track-status-pill:hover { background: #e2e8f0; }
+    
+    .track-filter-active-panel {
+        background: var(--track-hover-bg);
+        border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.2);
+        color: #00f0ff;
+        border-radius: 12px;
+        padding: 1.2rem;
+    }
+    .track-status-pill:hover { 
+        border-color: rgba(var(--track-primary-rgb, 0, 240, 255), 0.4);
+        color: var(--track-text);
+        background: var(--track-hover-bg);
+    }
 
-    /* Estados Activos con alto contraste */
-    .track-status-pill.active[data-status="2"] { background: #64748b; color: #fff; border-color: #64748b; }
-    .track-status-pill.active[data-status="3"] { background: #10b981; color: #fff; border-color: #10b981; }
-    .track-status-pill.active[data-status="4"] { background: #ef4444; color: #fff; border-color: #ef4444; }
-    .track-status-pill.active[data-status="5"] { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .track-status-pill.active {
+        color: #fff !important;
+        font-weight: 600 !important;
+        box-shadow: 0 0 15px var(--track-accent-glow);
+    }
+    .track-status-pill.active i {
+        color: #fff !important;
+    }
+
+    .track-status-pill.active[data-status="2"] { background: var(--track-primary); border-color: transparent; }
+    .track-status-pill.active[data-status="3"] { background: var(--track-success); border-color: transparent; }
+    .track-status-pill.active[data-status="4"] { background: var(--track-warning); border-color: transparent; }
+    .track-status-pill.active[data-status="5"] { background: var(--track-info); border-color: transparent; }
 
     .btn-search-main {
-        background: #0d6efd !important;
-        color: #fff !important;
+        background: var(--track-hover-bg) !important;
+        color: var(--track-primary) !important;
         font-weight: 700;
-        padding: 0.75rem 2rem;
-        border-radius: 0.6rem;
-        border: none;
-        transition: all 0.2s;
-        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.35rem;
+        border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.3) !important;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     .btn-search-main:hover {
-        background: #004dc2 !important;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(13, 110, 253, 0.35);
+        background: rgba(var(--track-primary-rgb, 0,255,255), 0.15) !important;
+        border-color: var(--track-primary) !important;
+        box-shadow: 0 0 15px var(--track-accent-glow);
     }
 </style>
 
-<div class="container track-page-header">
-    <div class="d-flex align-items-center gap-3">
-        <div class="track-icon-circle shadow-sm">
-            <i class="bi bi-funnel"></i>
+<div class="container track-page-header pt-5 mt-4 mb-4">
+    <div class="d-flex align-items-center gap-4">
+        <div class="track-icon-circle shadow-lg rounded-circle" style="width: 64px; height: 64px; background: rgba(var(--track-primary-rgb, 0,255,255), 0.1); border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.2);">
+            <i class="bi bi-radar fs-3" style="color: var(--track-primary);"></i>
         </div>
         <div>
-            <h1 class="track-page-title h3 mb-0">Panel de Consultas</h1>
-            <p class="track-page-lead small mb-0"><?= $sub ?></p>
+            <span class="track-pill mb-2 d-inline-block px-3 py-1 fw-bold" style="background: rgba(var(--track-primary-rgb, 0,255,255), 0.15); border: 1px solid rgba(var(--track-primary-rgb, 0,255,255), 0.3); border-radius: 9999px; color: var(--track-primary);"><i class="bi bi-terminal"></i> Scanner Activo</span>
+            <h1 class="track-page-title h1 mb-2 fw-bold text-uppercase" style="letter-spacing: 0.03em; font-family: 'Space Grotesk', sans-serif;">Rastreador de Nodos</h1>
+            <p class="track-page-lead mb-0" style="color: var(--track-muted); max-width: 800px;"><?= $sub ?></p>
         </div>
     </div>
 </div>
@@ -186,20 +250,20 @@ $noFormErr = $formError === null || $formError === '';
                 }
             }
          }">
-        <form method="post" action="/consultas" class="row align-items-end g-4">
+        <form method="post" action="/consultas" class="row align-items-end g-3">
             <?= csrf_field() ?>
             
             <!-- Rango de Fechas -->
-            <div class="col-12 col-xl-4">
+            <div class="col-12 col-xl-5">
                 <span class="track-label-mini">Periodo de tiempo</span>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-3">
                     <div class="track-input-group flex-fill">
-                        <i class="bi bi-calendar-event me-2 text-secondary"></i>
-                        <input type="date" class="form-control border-0 bg-transparent p-0 small" name="fecha_desde" value="<?= htmlspecialchars($fechaDesde ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Desde">
+                        <i class="bi bi-calendar-event me-2" style="color: #849495;"></i>
+                        <input type="date" class="form-control" name="fecha_desde" value="<?= htmlspecialchars($fechaDesde ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Desde" required>
                     </div>
                     <div class="track-input-group flex-fill">
-                        <i class="bi bi-calendar-check me-2 text-secondary"></i>
-                        <input type="date" class="form-control border-0 bg-transparent p-0 small" name="fecha_hasta" value="<?= htmlspecialchars($fechaHasta ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Hasta">
+                        <i class="bi bi-calendar-check me-2" style="color: #849495;"></i>
+                        <input type="date" class="form-control" name="fecha_hasta" value="<?= htmlspecialchars($fechaHasta ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Hasta" required>
                     </div>
                 </div>
             </div>
@@ -223,11 +287,11 @@ $noFormErr = $formError === null || $formError === '';
             </div>
 
             <!-- Acciones -->
-            <div class="col-12 col-xl-3">
-                <div class="d-flex gap-2 justify-content-xl-end">
-                    <a href="/consultas" class="btn btn-link text-secondary text-decoration-none small fw-bold mt-2">Limpiar</a>
+            <div class="col-12 col-xl-2">
+                <div class="d-flex gap-3 justify-content-xl-end align-items-center h-100 pb-1">
+                    <a href="/consultas" class="text-decoration-none small fw-bold" style="color: #849495; letter-spacing: 0.05em; text-transform: uppercase;">Limpiar</a>
                     <button type="submit" class="btn btn-search-main w-100 w-xl-auto">
-                        <i class="bi bi-search me-1"></i> Consultar
+                        <i class="bi bi-search me-2"></i> Consultar
                     </button>
                 </div>
             </div>
@@ -235,11 +299,9 @@ $noFormErr = $formError === null || $formError === '';
     </div>
 
     <?php if ($showResults && $filterSummary !== null && $filterSummary !== ''): ?>
-        <div class="card track-card border-0 bg-body-secondary mb-4">
-            <div class="card-body py-3 px-4">
-                <div class="small mb-1 text-secondary text-uppercase fw-semibold consulta-kicker">Filtros activos</div>
-                <p class="mb-0 fw-medium"><?= htmlspecialchars($filterSummary, ENT_QUOTES, 'UTF-8') ?></p>
-            </div>
+        <div class="track-filter-active-panel mb-4">
+            <div class="small mb-1 text-uppercase fw-bold opacity-75" style="letter-spacing:1px; font-size:0.65rem;">Filtros de Nodo Activos</div>
+            <p class="mb-0 fw-bold" style="color: var(--track-text);"><?= htmlspecialchars($filterSummary, ENT_QUOTES, 'UTF-8') ?></p>
         </div>
     <?php endif; ?>
 
@@ -334,23 +396,23 @@ $noFormErr = $formError === null || $formError === '';
             }
         }">
             <!-- Filtro de Búsqueda -->
-            <div class="card track-card mb-4 shadow-sm border-0">
-                <div class="card-body py-3">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="card track-card mb-4 border-0">
+                <div class="card-body py-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
                         <div class="flex-grow-1">
-                            <label for="consultaBuscar" class="form-label small text-secondary mb-1 fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Filtro Rápido</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0 text-primary"><i class="bi bi-search"></i></span>
-                                <input type="search" class="form-control border-start-0" id="consultaBuscar" x-model="q" @input="page = 1" placeholder="Ej: Pedido #, Cliente, Transportadora o Ciudad..." autocomplete="off">
+                            <label for="consultaBuscar" class="track-label-mini">Búsqueda en resultados</label>
+                            <div class="track-input-group">
+                                <i class="bi bi-search me-2" style="color: var(--track-primary);"></i>
+                                <input type="search" class="form-control border-0 bg-transparent p-0" style="color: var(--track-text);" id="consultaBuscar" x-model="q" @input="page = 1" placeholder="Filtrar por Nombre, Ciudad, ID..." autocomplete="off">
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                             <span class="text-secondary small">Mostrar:</span>
-                             <select class="form-select form-select-sm w-auto" x-model="pageSize" @change="page = 1">
-                                 <option value="15">15</option>
-                                 <option value="30">30</option>
-                                 <option value="50">50</option>
-                                 <option value="100">100</option>
+                        <div class="d-flex align-items-center gap-3">
+                             <span class="small fw-bold" style="color: var(--track-text); letter-spacing: 0.1em;">FILAS POR PÁGINA:</span>
+                             <select class="form-select form-select-sm w-auto border-secondary" x-model="pageSize" @change="page = 1" style="background: var(--track-surface-high); color: var(--track-text); border-radius: 8px;">
+                                  <option value="15">15</option>
+                                  <option value="30">30</option>
+                                  <option value="50">50</option>
+                                  <option value="100">100</option>
                              </select>
                         </div>
                     </div>
@@ -359,69 +421,69 @@ $noFormErr = $formError === null || $formError === '';
 
             <!-- Vista Desktop -->
             <div class="d-none d-lg-block mb-4">
-                <div class="card track-card border-0 shadow-sm overflow-hidden">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0 table-premium table-striped-soft" style="font-size: 0.85rem;">
-                            <thead>
+                <div class="card track-card border-0 overflow-hidden" style="background: var(--track-surface); backdrop-filter: var(--track-blur); border-radius: 16px; border: 1px solid var(--track-border); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
+                    <div class="table-responsive p-2">
+                        <table class="table align-middle mb-0 table-borderless table-premium">
+                            <thead style="border-bottom: 1px solid var(--track-border);">
                                 <tr>
-                                    <th @click="sortBy('id')" class="cursor-pointer" style="cursor:pointer">Pedido <i class="bi" :class="sortKey === 'id' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th>Producto</th>
-                                    <th @click="sortBy('customer')" class="cursor-pointer" style="cursor:pointer">Cliente <i class="bi" :class="sortKey === 'customer' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th>Guía</th>
-                                    <th @click="sortBy('city')" class="cursor-pointer" style="cursor:pointer">Ubicación <i class="bi" :class="sortKey === 'city' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th @click="sortBy('statusCode')" class="cursor-pointer text-center" style="cursor:pointer">Estado <i class="bi" :class="sortKey === 'statusCode' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th @click="sortBy('date')" class="cursor-pointer" style="cursor:pointer">Fecha <i class="bi" :class="sortKey === 'date' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th class="text-end px-4">Acción</th>
+                                    <th @click="sortBy('id')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em; padding-left: 1.5rem;">Pedido <i class="bi" :class="sortKey === 'id' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
+                                    <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Producto</th>
+                                    <th @click="sortBy('customer')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Cliente <i class="bi" :class="sortKey === 'customer' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
+                                    <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Guía y Transp.</th>
+                                    <th @click="sortBy('city')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Destino <i class="bi" :class="sortKey === 'city' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
+                                    <th @click="sortBy('statusCode')" class="cursor-pointer text-center text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Estado <i class="bi" :class="sortKey === 'statusCode' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
+                                    <th @click="sortBy('date')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Actualizado <i class="bi" :class="sortKey === 'date' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
+                                    <th class="text-end px-4 text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="o in paginated" :key="o.id">
-                                    <tr :class="o.statusCode === 4 ? 'semaphore-danger' : (o.statusCode === 3 || o.statusCode === 5 ? 'semaphore-success' : 'semaphore-info')">
-                                        <td>
-                                            <div class="fw-bold text-dark" x-text="'#' + o.id"></div>
-                                            <div class="small text-secondary text-uppercase fw-bold" style="font-size: 0.65rem;" x-text="o.carrier.substring(0,8)"></div>
+                                    <tr :class="o.statusCode === 4 ? 'semaphore-danger' : (o.statusCode === 3 || o.statusCode === 5 ? 'semaphore-success' : 'semaphore-info')" style="background: transparent !important; transition: background 0.3s ease;" @mouseover="$el.style.background='var(--track-hover-bg)'" @mouseleave="$el.style.background='transparent'">
+                                        <td style="padding-left: 1.5rem;">
+                                            <div class="fw-bold fs-6" style="color: var(--track-primary); text-shadow: 0 0 10px var(--track-accent-glow);" x-text="'#' + o.id"></div>
+                                            <div class="small text-uppercase fw-bold mt-1" style="color: var(--track-muted); letter-spacing: 0.05em; font-size: 0.65rem;" x-text="o.carrier.substring(0,12)"></div>
                                         </td>
                                         <td>
-                                            <div class="d-flex align-items-center gap-2">
+                                            <div class="d-flex align-items-center gap-3">
                                                 <template x-if="o.image">
-                                                    <img :src="o.image" class="rounded border shadow-sm" style="width: 36px; height: 36px; object-fit: cover;" loading="lazy">
+                                                    <img :src="o.image" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--track-border);" loading="lazy">
                                                 </template>
                                                 <template x-if="!o.image">
-                                                    <div class="rounded border bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 36px; height: 36px;"><i class="bi bi-box small"></i></div>
+                                                    <div class="rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--track-surface-high); border: 1px solid var(--track-border);"><i class="bi bi-box small" style="color: var(--track-muted);"></i></div>
                                                 </template>
-                                                <div style="line-height: 1.2">
-                                                    <div class="fw-bold text-truncate" style="max-width: 150px;" x-text="o.name || 'Sin nombre'"></div>
-                                                    <div class="text-secondary" style="font-size: 0.7rem;" x-text="o.warehouse"></div>
+                                                <div style="line-height: 1.3">
+                                                    <div class="fw-bold text-truncate" style="max-width: 180px; color: var(--track-text);" x-text="o.name || 'Sin nombre'"></div>
+                                                    <div style="font-size: 0.75rem; color: var(--track-muted);" x-text="o.warehouse"></div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="fw-medium text-dark" x-text="o.customer"></div>
-                                            <div class="d-flex align-items-center gap-1 small text-secondary">
+                                            <div class="fw-medium" style="color: var(--track-text);" x-text="o.customer"></div>
+                                            <div class="d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; color: var(--track-muted);">
                                                 <span x-text="o.phone"></span>
-                                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" @click="navigator.clipboard.writeText(o.phone).then(() => notify('Teléfono copiado', 'success'))"><i class="bi bi-clipboard small"></i></button>
+                                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" @click="navigator.clipboard.writeText(o.phone).then(() => notify('Teléfono copiado', 'success'))"><i class="bi bi-clipboard" style="color: var(--track-info);"></i></button>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="font-monospace small d-flex align-items-center gap-1">
-                                                <span class="text-truncate" style="max-width: 100px;" x-text="o.guide"></span>
-                                                <button type="button" class="btn btn-sm p-0 text-secondary" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard small"></i></button>
+                                            <div class="font-monospace d-flex align-items-center gap-2" style="color: var(--track-text);">
+                                                <span class="text-truncate" style="max-width: 120px;" x-text="o.guide"></span>
+                                                <button type="button" class="btn btn-sm p-0" title="Copiar Guía" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard" style="color: var(--track-info);"></i></button>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="fw-bold text-dark lh-1 mb-1" x-text="o.city"></div>
-                                            <div class="text-secondary small" x-text="o.dept"></div>
+                                            <div class="fw-bold lh-1 mb-1" style="color: var(--track-text);" x-text="o.city"></div>
+                                            <div class="small" style="color: var(--track-muted);" x-text="o.dept"></div>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge rounded-pill px-3 py-2 fw-semibold" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
+                                            <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
                                         </td>
                                         <td>
-                                            <div class="fw-bold text-dark lh-1 mb-1" x-text="o.date"></div>
-                                            <div class="text-secondary small" x-text="o.time"></div>
+                                            <div class="fw-bold lh-1 mb-1" style="color: var(--track-text);" x-text="o.date"></div>
+                                            <div class="small" style="color: var(--track-muted);" x-text="o.time"></div>
                                         </td>
                                         <td class="text-end px-4">
                                             <template x-if="o.tracking">
-                                                <a :href="o.tracking" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">Tracking</a>
+                                                <a :href="o.tracking" target="_blank" class="btn btn-sm rounded-pill px-4 fw-bold" style="background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3);">Rastrear</a>
                                             </template>
                                         </td>
                                     </tr>
@@ -435,42 +497,42 @@ $noFormErr = $formError === null || $formError === '';
             <!-- Vista Móvil -->
             <div class="d-lg-none">
                 <template x-for="o in paginated" :key="o.id">
-                    <div class="card track-card border-0 shadow-sm mb-3 overflow-hidden" :class="o.statusCode === 4 ? 'semaphore-danger' : (o.statusCode === 3 || o.statusCode === 5 ? 'semaphore-success' : 'semaphore-info')">
+                    <div class="card track-card border-0 mb-3 overflow-hidden" style="background: var(--track-surface); backdrop-filter: var(--track-blur); border-radius: 12px; border: 1px solid var(--track-border); box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-3">
                                     <template x-if="o.image">
-                                        <img :src="o.image" class="rounded border shadow-sm" style="width: 42px; height: 42px; object-fit: cover;">
+                                        <img :src="o.image" class="rounded shadow-sm" style="width: 48px; height: 48px; object-fit: cover; border: 1px solid rgba(132, 148, 149, 0.2);">
                                     </template>
                                     <div>
-                                        <div class="small text-secondary text-uppercase fw-bold" style="font-size: 0.6rem;">Pedido #<span x-text="o.id"></span></div>
-                                        <div class="fw-bold text-dark" x-text="o.name"></div>
+                                        <div class="small fw-bold text-uppercase" style="color: var(--track-primary); font-size: 0.65rem;">Pedido #<span x-text="o.id"></span></div>
+                                        <div class="fw-bold lh-sm mt-1" style="color: var(--track-text);" x-text="o.name"></div>
                                     </div>
                                 </div>
-                                <span class="badge rounded-pill px-2" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
+                                <span class="badge rounded-pill px-2 py-1" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
                             </div>
-                            <div class="row g-2 small">
+                            <div class="row g-3 small mb-3">
                                 <div class="col-6">
-                                    <label class="text-secondary d-block mb-0">Cliente</label>
-                                    <div class="fw-medium text-dark" x-text="o.customer"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Cliente</label>
+                                    <div class="fw-medium" style="color: var(--track-text);" x-text="o.customer"></div>
                                 </div>
                                 <div class="col-6">
-                                    <label class="text-secondary d-block mb-0">Ciudad</label>
-                                    <div class="fw-medium text-dark" x-text="o.city"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Destino</label>
+                                    <div class="fw-medium" style="color: var(--track-text);" x-text="o.city"></div>
                                 </div>
                                 <div class="col-6">
-                                    <label class="text-secondary d-block mb-0">Guía</label>
-                                    <div class="font-monospace text-dark" x-text="o.guide"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Guía</label>
+                                    <div class="font-monospace" style="color: var(--track-text);" x-text="o.guide"></div>
                                 </div>
                                 <div class="col-6">
-                                    <label class="text-secondary d-block mb-0">Fecha</label>
-                                    <div class="text-dark" x-text="o.date"></div>
+                                    <label class="d-block mb-1 text-uppercase fw-bold" style="color: var(--track-muted); font-size: 0.65rem;">Actualización</label>
+                                    <div style="color: var(--track-text);" x-text="o.date"></div>
                                 </div>
                             </div>
-                            <div class="mt-3 pt-3 border-top d-flex justify-content-between">
-                                <button class="btn btn-sm btn-light border rounded-pill px-3" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard me-1"></i>Copiar Guía</button>
+                            <div class="pt-3 d-flex justify-content-between gap-2" style="border-top: 1px solid var(--track-border);">
+                                <button class="btn btn-sm w-100 fw-bold" style="background: var(--track-surface-high); color: var(--track-text); border: 1px solid var(--track-border); border-radius: 8px;" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard me-2"></i>Copiar Guía</button>
                                 <template x-if="o.tracking">
-                                    <a :href="o.tracking" target="_blank" class="btn btn-sm btn-primary rounded-pill px-3">Rastrear</a>
+                                    <a :href="o.tracking" target="_blank" class="btn btn-sm w-100 fw-bold" style="background: rgba(var(--track-primary-rgb, 0, 240, 255), 0.1); color: var(--track-primary); border: 1px solid rgba(var(--track-primary-rgb, 0, 240, 255), 0.3); border-radius: 8px;">Rastrear</a>
                                 </template>
                             </div>
                         </div>
@@ -481,7 +543,7 @@ $noFormErr = $formError === null || $formError === '';
             <!-- Controles de Paginación -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4 mb-5" x-show="filtered.length > 0">
                 <div class="text-secondary small">
-                    Mostrando <span class="fw-bold text-dark" x-text="((page-1)*pageSize)+1"></span> a <span class="fw-bold text-dark" x-text="Math.min(page*pageSize, filtered.length)"></span> de <span class="fw-bold" x-text="filtered.length"></span> resultados.
+                    Mostrando <span class="fw-bold" style="color: var(--track-text);" x-text="((page-1)*pageSize)+1"></span> a <span class="fw-bold" style="color: var(--track-text);" x-text="Math.min(page*pageSize, filtered.length)"></span> de <span class="fw-bold" x-text="filtered.length"></span> resultados.
                 </div>
                 <nav aria-label="Paginación">
                     <ul class="pagination mb-0 track-pagination">

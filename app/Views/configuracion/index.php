@@ -18,15 +18,21 @@ $errApi = $errors['api_base_url'] ?? null;
 $errTienda = $errors['tienda_id'] ?? null;
 ?>
 <div class="container track-page-header">
-    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3">
-        <div>
-            <h1 class="track-page-title h2 mb-1"><?= $h ?></h1>
-            <p class="track-page-lead mb-0">
-                Define la URL base del API, el identificador de tienda y el token de acceso. El token se guarda cifrado y no se muestra en pantalla.
-            </p>
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="track-icon-circle shadow-lg" style="width: 3.5rem; height: 3.5rem; font-size: 1.5rem;">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <span class="track-pill mb-2"><i class="bi bi-gear-fill"></i> Configuración de Núcleo</span>
+                <h1 class="track-page-title h2 mb-0"><?= $h ?></h1>
+            </div>
         </div>
         <?php if ($has_stored_token && ! $dbUnavailable): ?>
-            <span class="track-pill align-self-start"><i class="bi bi-shield-lock" aria-hidden="true"></i> Token almacenado de forma segura</span>
+            <div class="glow-border-glass p-3 rounded-pill d-flex align-items-center gap-2" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                <i class="bi bi-shield-check text-success fs-5"></i>
+                <span class="small fw-bold text-success uppercase" style="letter-spacing:1px;">Token Encriptado Activo</span>
+            </div>
         <?php endif; ?>
     </div>
 </div>
@@ -54,7 +60,44 @@ $errTienda = $errors['tienda_id'] ?? null;
             </p>
         </div>
     <?php else: ?>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center g-4">
+            <!-- Sync Section -->
+            <div class="col-lg-4">
+                <div class="card track-card p-4 h-100">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="track-icon-circle bg-primary bg-opacity-10 text-primary" style="width: 2.5rem; height: 2.5rem; font-size: 1.1rem;">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <h2 class="h5 mb-0">Sincronización</h2>
+                    </div>
+                    <p class="text-secondary small mb-4">
+                        Inicia sesión con tu cuenta de Merkaweb para capturar automáticamente el **Token de Acceso** y el **ID de tu Tienda**.
+                    </p>
+                    
+                    <form method="post" action="/configuracion/sync">
+                        <?= csrf_field() ?>
+                        <div class="mb-3">
+                            <label for="email" class="form-label small fw-bold text-uppercase opacity-75">Correo Electrónico</label>
+                            <input type="email" name="email" id="email" class="form-control" placeholder="info@ejemplo.org" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label small fw-bold text-uppercase opacity-75">Contraseña</label>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">
+                            <i class="bi bi-cloud-download me-2"></i>Sincronizar Datos
+                        </button>
+                    </form>
+
+                    <div class="mt-4 pt-3 border-top border-secondary border-opacity-10">
+                        <div class="d-flex align-items-center gap-2 text-secondary">
+                            <i class="bi bi-info-circle fs-5"></i>
+                            <span class="small">Esto actualizará tus credenciales guardadas automáticamente.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-lg-8">
                 <div class="card track-card track-card--emphasis p-4 p-md-5">
                     <form method="post" action="/configuracion" class="track-settings-form" autocomplete="off">
@@ -71,6 +114,7 @@ $errTienda = $errors['tienda_id'] ?? null;
                                 id="api_base_url"
                                 class="form-control form-control-lg <?= $errApi ? 'is-invalid' : '' ?>"
                                 x-model="apiUrl"
+                                style="border-radius: 12px; background: var(--track-surface-high); border-color: var(--track-border); color: var(--track-text);"
                                 placeholder="https://api.ejemplo.com"
                                 maxlength="512"
                                 required
@@ -78,7 +122,7 @@ $errTienda = $errors['tienda_id'] ?? null;
                             <?php if ($errApi): ?>
                                 <div class="invalid-feedback"><?= htmlspecialchars($errApi, ENT_QUOTES, 'UTF-8') ?></div>
                             <?php endif; ?>
-                            <div class="form-text">Incluye el esquema (<code>https://</code>). Se normaliza quitando la barra final.</div>
+                            <div class="form-text text-muted">Protocolo de enlace seguro requerido (<code>https://</code>).</div>
                         </div>
 
                         <div class="mb-4">
@@ -107,12 +151,12 @@ $errTienda = $errors['tienda_id'] ?? null;
                                     id="access_token"
                                     class="form-control font-monospace"
                                     value=""
+                                    style="border-radius: 12px 0 0 12px; background: var(--track-surface-high); border-color: var(--track-border); color: var(--track-text);"
                                     autocomplete="new-password"
-                                    placeholder="<?= $has_stored_token ? 'Dejar vacío para conservar el token actual' : 'Pega el token aquí' ?>"
+                                    placeholder="<?= $has_stored_token ? 'Dejar vacío para conservar token' : 'Pega el token aquí' ?>"
                                     aria-describedby="access_token_help token_toggle_label"
                                 >
-                                <button class="btn btn-outline-secondary" type="button" @click="show = !show" :aria-pressed="show" aria-labelledby="token_toggle_label">
-                                    <span id="token_toggle_label" class="visually-hidden">Mostrar u ocultar token</span>
+                                <button class="btn btn-outline-secondary border-opacity-25" type="button" @click="show = !show" :aria-pressed="show" aria-labelledby="token_toggle_label">
                                     <i class="bi" :class="show ? 'bi-eye-slash' : 'bi-eye'" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -121,10 +165,10 @@ $errTienda = $errors['tienda_id'] ?? null;
                             </div>
                         </div>
 
-                        <div class="d-flex flex-wrap gap-2 justify-content-end pt-2 border-top mt-4 pt-4">
-                            <a class="btn btn-outline-secondary" href="/">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save me-1" aria-hidden="true"></i>Guardar configuración
+                        <div class="d-flex flex-wrap gap-2 justify-content-end pt-2 border-top border-secondary border-opacity-10 mt-4 pt-4">
+                            <a class="btn btn-link text-muted text-decoration-none fw-bold small px-4" href="/">Abordar Cambio</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                                <i class="bi bi-save me-1" aria-hidden="true"></i>Commit Cambios
                             </button>
                         </div>
                     </form>
@@ -135,7 +179,7 @@ $errTienda = $errors['tienda_id'] ?? null;
                             <div>
                                 <h2 class="h6 mb-1">Prueba de conexión</h2>
                                 <p class="text-secondary small mb-0">
-                                    Envía una petición real <span class="text-nowrap">GET <code>/ordenes/find</code></span> con <code>estado=2</code> usando la configuración <strong>ya guardada</strong>. No muestra el token.
+                                    Envía una petición real <span class="text-nowrap">GET <code style="color: var(--track-info)">/ordenes/find</code></span> con <code style="color: var(--track-info)">estado=2</code> usando la configuración <strong>ya guardada</strong>. No muestra el token.
                                 </p>
                             </div>
                             <button type="submit" class="btn btn-outline-secondary flex-shrink-0">

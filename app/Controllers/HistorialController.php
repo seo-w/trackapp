@@ -10,6 +10,7 @@ final class HistorialController extends Controller
 {
     public function index(): void
     {
+        $this->requireAuth();
         /** @var list<array<string, mixed>> $logs */
         $logs = [];
         $dbUnavailable = false;

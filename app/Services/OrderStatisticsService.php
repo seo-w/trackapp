@@ -164,6 +164,33 @@ final class OrderStatisticsService
             return $b['total'] <=> $a['total'];
         });
 
+        // Track returns and total by courier
+        $courierStats = [];
+        foreach ($orders as $order) {
+            $status = (int) ($order['statusCode'] ?? 0);
+            $courier = (string) ($order['carrierName'] ?? 'No indicada');
+
+            if (!isset($courierStats[$courier])) {
+                $courierStats[$courier] = ['total' => 0, 'returns' => 0, 'pct' => 0.0];
+            }
+            
+            $courierStats[$courier]['total']++;
+            if ($status === 4) {
+                $courierStats[$courier]['returns']++;
+            }
+        }
+
+        foreach ($courierStats as $courier => $data) {
+            if ($data['total'] > 0) {
+                $courierStats[$courier]['pct'] = round(($data['returns'] / $data['total']) * 100, 1);
+            }
+        }
+
+        // Sort by returns descending
+        uasort($courierStats, function($a, $b) {
+            return $b['returns'] <=> $a['returns'];
+        });
+
         // Sort by month key descending (newest first)
         krsort($months);
 
@@ -174,6 +201,7 @@ final class OrderStatisticsService
             'global' => $global,
             'months' => $months,
             'returnsByCity' => $returnsByCity,
+            'courierStats' => $courierStats,
             'successByCity' => $successByCity,
             'productStats' => $productStats,
             'grandTotal' => array_sum($global),

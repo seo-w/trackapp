@@ -8,6 +8,8 @@ final class HomeController extends Controller
 {
     public function index(): void
     {
+        $this->requireAuth();
+
         $this->view('home', [
             'title' => 'Inicio',
             'heading' => 'TrackApp',
