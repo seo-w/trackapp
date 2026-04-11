@@ -140,6 +140,7 @@ final class StatsController extends Controller
 
         } catch (\Throwable $e) {
             $this->view('estadisticas', [
+                'title' => 'Estadísticas',
                 'error' => 'No se pudieron cargar las estadísticas: ' . $e->getMessage(),
                 'months' => [],
                 'apiWarnings' => [],
@@ -149,6 +150,7 @@ final class StatsController extends Controller
             ]);
             return;
         }
+
 
         $this->view('estadisticas', [
             'title' => 'Estadísticas y Finanzas',
