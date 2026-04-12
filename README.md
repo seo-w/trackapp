@@ -12,11 +12,67 @@ No se utiliza Composer para el núcleo de la aplicación ni runtime Node.
 ## Instalación rápida
 
 1. Clonar o subir el proyecto al servidor.
-2. Apuntar el **document root** del virtual host a la carpeta **`public/`** (no sirvas `app/`, `config/` ni `storage/` directamente).
-3. Copiar **`.env.example`** a **`.env`** y completar variables (ver siguientes secciones).
-4. Crear la base de datos MySQL/MariaDB y un usuario con permisos sobre esa base.
-5. Ejecutar migración: `php database/migrate.php`
-6. Ajustar permisos de escritura si el host lo requiere para `storage/logs/` y sesiones PHP.
+# TrackApp — Ecosistema de Logística y Finanzas
+
+Aplicación web premium centrada en la **Inteligencia Operativa** para dropshipping y logística. Permite consultar órdenes en Merkaweb, normalizar resultados, generar seguimiento y analizar el rendimiento financiero y logístico mediante visualizaciones avanzadas.
+
+## ✨ Características Principales
+
+- **Dashboard de Analítica Avanzada**: Integración con **Apache ECharts** para visualización de Big Data.
+  - **Análisis de Pareto (80/20)**: Identificación de productos top con sincronización de ejes (Profit vs % Cumulativo).
+  - **Mapa de Calor Geográfico**: Concentración de ventas y efectividad por departamentos en Colombia.
+  - **Matriz de Logística**: Heatmap de transportadoras vs ciudades para optimizar rutas de entrega.
+  - **Análisis Waterfall (Cascada)**: Desglose visual de Ventas Brutas vs Costos vs Profit Real.
+  - **Correlación de Pauta**: Gráficos de dispersión para analizar el impacto del gasto publicitario en la tasa de devolución.
+- **Interfaz "Cyber-Crystal"**: UI moderna con estética de cristal (glassmorphism), modo oscuro/claro dinámico y transiciones fluidas.
+- **Gestión de Pautas**: Registro y persistencia de gasto publicitario por mes para cálculo de ROAS y CPA real.
+- **Historial y Auditoría**: Registro completo de consultas y estados para trazabilidad absoluta.
+- **Compatibilidad Extrema**: Refactoreado para **PHP 7.0+**, permitiendo despliegue en hostings heredados sin sacrificar estética premium.
+
+## 🛠 Requisitos de Entorno
+
+- **Servidor**: Apache/Nginx con `mod_rewrite`.
+- **PHP**: **7.0 o superior** (Optimizado para compatibilidad máxima).
+- **Extensiones**: `pdo_mysql`, `openssl`, `json`, `session`, `curl`, `mbstring`.
+- **Base de Datos**: MySQL 5.7+ / MariaDB 10.3+.
+
+## 🚀 Instalación y Despliegue
+
+1. **Despliegue**: Clonar en el servidor y apuntar el **document root** a la carpeta `public/`.
+2. **Entorno**: Copiar `.env.example` a `.env` y configurar credenciales de base de datos y la `APP_KEY`.
+3. **Persistencia**: Crear la base de datos y ejecutar el script de migración: `php database/migrate.php`.
+4. **Seguridad**: Asegurar que `storage/logs/` tenga permisos de escritura.
+
+## 📊 Módulos del Sistema
+
+### 1. Consultas y Operación
+- Filtrado inteligente por estados **2 (Despachado)**, **3 (Entregado)**, **4 (Devuelto)** y **5 (Legalizado)**.
+- Normalización robusta de datos de Merkaweb.
+- Enlaces de seguimiento personalizados.
+
+### 2. Tablero de Estadísticas (Analytics)
+- **Consolidado**: KPIs globales de gestión.
+- **Logística**: Rendimiento por transportadoras y Heatmap de ciudades.
+- **Geografía**: Mapa interactivo de Colombia para expansión de mercado.
+- **Productos**: Rendimiento de inventario y Análisis de Concentración (Pareto) para optimización de stock.
+
+### 3. Finanzas y Desempeño
+- Control de pauta publicitaria.
+- Cálculo de **Profit Neto Real** (Ventas - Costos de Producto - Fletes de Éxito - Fletes de Devolución - Pauta).
+- Métricas de eficiencia: **ROAS**, **CPA Promedio** y **Margen Unitario**.
+
+## 🏗 Arquitectura
+
+El proyecto sigue una estructura de **separación de responsabilidades** limpia sin depender de frameworks pesados:
+
+- `app/Controllers`: Lógica de flujo y manejo de peticiones.
+- `app/Domain`: Lógica de negocio (Normalización, Mapeo de Estados).
+- `app/Services`: Integraciones con APIs (Merkaweb) y lógica de cálculo estadístico.
+- `app/Repositories`: Capa de persistencia centralizada.
+- `app/Views`: Vistas con motor nativo PHP y componentes Alpine.js/ECharts.
+
+---
+© 2026 **TrackApp Team**. Rendimiento y Precisión en cada entrega.
 
 ## Base de datos
 

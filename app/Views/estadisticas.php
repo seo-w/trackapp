@@ -346,6 +346,209 @@ declare(strict_types=1);
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Gráficos Estratégicos Globales -->
+                                <div class="col-12 mt-4">
+                                    <div class="row g-4">
+                                        <!-- Gráfico 1 — Profit neto acumulado -->
+                                        <div class="col-12 mb-4">
+                                            <div class="card track-card border-0 overflow-hidden">
+                                                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="card-title fw-bold mb-0 text-primary"><i class="bi bi-water me-2"></i>Profit Neto Acumulado</h6>
+                                                        <p class="text-muted small mb-0">Rendimiento mensual vs curva de crecimiento acumulada.</p>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-outline-primary border-0 opacity-75" type="button" data-bs-toggle="collapse" data-bs-target="#profitInfo" aria-expanded="false">
+                                                        <i class="bi bi-question-circle me-1"></i> ¿Cómo leer?
+                                                    </button>
+                                                </div>
+                                                <div class="collapse px-4 pt-2" id="profitInfo">
+                                                    <div class="p-3 rounded-3" style="background: rgba(var(--track-primary-rgb), 0.05); border: 1px dashed rgba(var(--track-primary-rgb), 0.2);">
+                                                        <h7 class="small fw-bold d-block mb-2 text-primary">Interpretación del Flujo:</h7>
+                                                        <ul class="small text-muted mb-0 ps-3">
+                                                            <li><span class="text-success fw-bold">Barras:</span> Beneficio real cada mes (Ventas - Costos - Pauta - Devoluciones).</li>
+                                                            <li><span class="text-info fw-bold">Línea Azul:</span> Crecimiento acumulado de tu capital. El punto donde cruza arriba del eje cero es tu **punto de equilibrio real**.</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-4">
+                                                    <div id="trendChartProfit" style="width: 100%; height: 350px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Gráfico 3 — ROAS vs Gasto en Pauta -->
+                                        <div class="col-12 mb-4">
+                                            <div class="card track-card border-0 overflow-hidden">
+                                                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="card-title fw-bold mb-0 text-primary"><i class="bi bi-megaphone me-2"></i>ROAS vs Gasto en Pauta</h6>
+                                                        <p class="text-muted small mb-0">Eficiencia publicitaria correlacionada con la inversión.</p>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-outline-warning border-0 opacity-75" type="button" data-bs-toggle="collapse" data-bs-target="#roasInfo" aria-expanded="false">
+                                                        <i class="bi bi-question-circle me-1"></i> Análisis de Escalado
+                                                    </button>
+                                                </div>
+                                                <div class="collapse px-4 pt-2" id="roasInfo">
+                                                    <div class="p-3 rounded-3" style="background: rgba(245, 158, 11, 0.05); border: 1px dashed rgba(245, 158, 11, 0.2);">
+                                                        <p class="small text-muted mb-0"><strong>La Clave del Escalado:</strong> Al subir la inversión (barras), el ROAS (línea naranja) debe mantenerse estable. Si la línea cae drásticamente mientras las barras suben, estás "quemando" dinero con audiencias saturadas o creatividades poco eficientes.</p>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-4">
+                                                    <div id="trendChartRoas" style="width: 100%; height: 350px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Gráfico 4 — Efectividad de Entrega -->
+                                        <div class="col-12 mb-4">
+                                            <div class="card track-card border-0 overflow-hidden">
+                                                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="card-title fw-bold mb-0 text-primary"><i class="bi bi-shield-check me-2"></i>Efectividad de Entrega Histórica</h6>
+                                                        <p class="text-muted small mb-0">Balance entre éxito logístico y tasa de retorno.</p>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-outline-success border-0 opacity-75" type="button" data-bs-toggle="collapse" data-bs-target="#deliveryInfo" aria-expanded="false">
+                                                        <i class="bi bi-question-circle me-1"></i> Salud Logística
+                                                    </button>
+                                                </div>
+                                                <div class="collapse px-4 pt-2" id="deliveryInfo">
+                                                    <div class="p-3 rounded-3" style="background: rgba(32, 201, 151, 0.05); border: 1px dashed rgba(32, 201, 151, 0.2);">
+                                                        <p class="small text-muted mb-0">Mide la brecha entre la <span class="text-success fw-bold">Línea Verde</span> (Entregas exitosas) y la <span class="text-danger fw-bold">Roja Punteada</span> (Devoluciones). Cuanto más separadas estén las líneas, más sano es tu modelo. Si se acercan, el costo de las devoluciones comerá tu profit del mes.</p>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-4">
+                                                    <div id="trendChartDelivery" style="width: 100%; height: 350px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Gráfico 5 — % Devoluciones vs Utilidad Bruta -->
+                                        <div class="col-12 mb-4">
+                                            <div class="card track-card border-0 overflow-hidden">
+                                                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="card-title fw-bold mb-0 text-primary"><i class="bi bi-graph-down-arrow me-2"></i>% Devoluciones vs Utilidad Bruta</h6>
+                                                        <p class="text-muted small mb-0">Impacto de la logística en la utilidad operativa.</p>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-outline-danger border-0 opacity-75" type="button" data-bs-toggle="collapse" data-bs-target="#utilityInfo" aria-expanded="false">
+                                                        <i class="bi bi-question-circle me-1"></i> Calidad de Audiencia
+                                                    </button>
+                                                </div>
+                                                <div class="collapse px-4 pt-2" id="utilityInfo">
+                                                    <div class="p-3 rounded-3" style="background: rgba(234, 88, 12, 0.05); border: 1px dashed rgba(234, 88, 12, 0.2);">
+                                                        <p class="small text-muted mb-0"><i class="bi bi-lightning-charge me-1 text-danger"></i><strong>Señal de Peligro:</strong> Si la utilidad (barras) sube, pero el % de devoluciones (línea naranja) también crece, significa que estás escalando atrayendo a clientes de "baja calidad" o que tus anuncios están prometiendo algo que el producto no cumple.</p>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-4">
+                                                    <div id="trendChartUtility" style="width: 100%; height: 350px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                        const trendMonths = [...<?= json_encode($months ?? []) ?>].reverse(); // Cronológico
+                                        const labels = trendMonths.map(m => m.label);
+                                        const profits = trendMonths.map(m => m.profit);
+                                        const pauta = trendMonths.map(m => m.pauta);
+                                        const roas = trendMonths.map(m => m.roas);
+                                        const utilBruta = trendMonths.map(m => m.utilidad_bruta);
+                                        const efectividad = trendMonths.map(m => m.efectividad_pct);
+                                        const devolucion = trendMonths.map(m => m.devolucion_pct);
+
+                                        let runningProfit = 0;
+                                        const cumulativeProfit = profits.map(v => {
+                                            runningProfit += v;
+                                            return runningProfit;
+                                        });
+
+                                        const commonGrid = { left: '8%', right: '8%', bottom: '15%', top: '15%', containLabel: true };
+                                        const commonTool = { trigger: 'axis', axisPointer: { type: 'cross' }, backgroundColor: 'rgba(20, 20, 30, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)', textStyle: { color: '#fff' } };
+
+                                        // 1. Profit Neto Acumulado
+                                        const profitChart = echarts.init(document.getElementById('trendChartProfit'), 'dark');
+                                        profitChart.setOption({
+                                            backgroundColor: 'transparent',
+                                            tooltip: commonTool,
+                                            grid: commonGrid,
+                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
+                                            yAxis: [
+                                                { type: 'value', name: 'Mensual', splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+                                                { type: 'value', name: 'Acumulado' }
+                                            ],
+                                            series: [
+                                                { 
+                                                    name: 'Profit Mensual', 
+                                                    type: 'bar', 
+                                                    data: profits,
+                                                    itemStyle: { 
+                                                        color: (p) => p.value >= 0 ? '#00ff88' : '#ff4444',
+                                                        borderRadius: [4, 4, 0, 0]
+                                                    }
+                                                },
+                                                { name: 'Acumulado', type: 'line', yAxisIndex: 1, data: cumulativeProfit, step: 'start', smooth: true, lineStyle: { width: 3, color: '#00d2ff' }, symbolSize: 8, itemStyle: { color: '#00d2ff' } }
+                                            ]
+                                        });
+
+                                        // 3. ROAS vs Gasto Pauta
+                                        const roasChart = echarts.init(document.getElementById('trendChartRoas'), 'dark');
+                                        roasChart.setOption({
+                                            backgroundColor: 'transparent',
+                                            tooltip: commonTool,
+                                            grid: commonGrid,
+                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
+                                            yAxis: [
+                                                { type: 'value', name: 'Gasto Pauta ($)', splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+                                                { type: 'value', name: 'ROAS', min: 0 }
+                                            ],
+                                            series: [
+                                                { name: 'Gasto Pauta', type: 'bar', data: pauta, itemStyle: { color: '#6366f1', borderRadius: [4, 4, 0, 0] } },
+                                                { name: 'ROAS', type: 'line', yAxisIndex: 1, data: roas, symbolSize: 10, lineStyle: { width: 4, color: '#f59e0b' }, itemStyle: { color: '#f59e0b' } }
+                                            ]
+                                        });
+
+                                        // 4. Efectividad de Entrega
+                                        const deliveryChart = echarts.init(document.getElementById('trendChartDelivery'), 'dark');
+                                        deliveryChart.setOption({
+                                            backgroundColor: 'transparent',
+                                            tooltip: commonTool,
+                                            grid: commonGrid,
+                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
+                                            yAxis: { type: 'value', name: '%', min: 0, max: 100, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+                                            series: [
+                                                { name: '% Entregado', type: 'line', data: efectividad, smooth: true, lineStyle: { width: 4, color: '#20c997' }, itemStyle: { color: '#20c997' } },
+                                                { name: '% Devuelto', type: 'line', data: devolucion, smooth: true, lineStyle: { width: 3, type: 'dashed', color: '#ff4444' }, itemStyle: { color: '#ff4444' } }
+                                            ]
+                                        });
+
+                                        // 5. Devolución vs Utilidad
+                                        const utilityChart = echarts.init(document.getElementById('trendChartUtility'), 'dark');
+                                        utilityChart.setOption({
+                                            backgroundColor: 'transparent',
+                                            tooltip: commonTool,
+                                            grid: commonGrid,
+                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
+                                            yAxis: [
+                                                { type: 'value', name: 'Utilidad Bruta ($)', splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+                                                { type: 'value', name: '% Devolución', min: 0 }
+                                            ],
+                                            series: [
+                                                { name: 'Utilidad Bruta', type: 'bar', data: utilBruta, itemStyle: { color: '#3b82f6', borderRadius: [4, 4, 0, 0] } },
+                                                { name: '% Devolución', type: 'line', yAxisIndex: 1, data: devolucion, symbolSize: 10, lineStyle: { width: 4, color: '#ea580c' }, itemStyle: { color: '#ea580c' } }
+                                            ]
+                                        });
+
+                                        window.addEventListener('resize', () => {
+                                            profitChart.resize();
+                                            roasChart.resize();
+                                            deliveryChart.resize();
+                                            utilityChart.resize();
+                                        });
+                                    });
+                                </script>
                             </div>
                         <?php endif; ?>
 
@@ -444,6 +647,98 @@ declare(strict_types=1);
                                         </div>
                                     <?php endif; ?>
                                 </div>
+
+                                <!-- Gráfico Heatmap: Fiabilidad por Ruta -->
+                                <?php if (!empty($detailedStats['advanced']['heatmap']['matrix'])): ?>
+                                    <div class="card border-0 shadow-sm mb-5" style="background: var(--track-surface-high); border: 1px solid var(--track-border) !important;">
+                                        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold" style="color: var(--track-text);">
+                                                    <i class="bi bi-grid-3x3-gap me-2" style="color: var(--track-primary);"></i>
+                                                    Matriz de Fiabilidad: Carrier vs Ciudad
+                                                </h6>
+                                                <p class="small text-muted mb-0 mt-1">Éxito de entrega por ruta. El color verde indica mayor efectividad.</p>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-info border-0 opacity-75" type="button" data-bs-toggle="collapse" data-bs-target="#heatmapInfo" aria-expanded="false" style="font-size: 0.75rem;">
+                                                <i class="bi bi-question-circle me-1"></i> ¿Cómo leer?
+                                            </button>
+                                        </div>
+                                        <div class="collapse px-4 pt-2" id="heatmapInfo">
+                                            <div class="p-3 rounded-3" style="background: rgba(0, 210, 255, 0.05); border: 1px dashed rgba(0, 210, 255, 0.2);">
+                                                <h7 class="small fw-bold d-block mb-2 text-info">¿Cómo elegir la mejor transportadora?</h7>
+                                                <p class="small text-muted mb-3">Esta matriz cruza tus <b>Transportadoras</b> con las <b>Ciudades</b> donde vendes. El objetivo es que sepas por dónde es seguro enviar y dónde estás perdiendo dinero por devoluciones.</p>
+                                                <ul class="small text-muted mb-0 ps-3">
+                                                    <li><span class="text-success fw-bold">Verde (90-100%):</span> <b>¡Ruta Maestra!</b> La transportadora cumple casi siempre. Puedes escalar publicidad en esta ciudad con total tranquilidad.</li>
+                                                    <li><span class="text-warning fw-bold">Amarillo (70-89%):</span> <b>Zona de Cuidado.</b> La operación es estable, pero hay fallos ocasionales. Monitorea las guías de cerca.</li>
+                                                    <li><span class="text-danger fw-bold">Rojo / Naranja (< 70%):</span> <b>¡Fuga de Dinero!</b> Demasiadas devoluciones en esta ruta. Considera cambiar de carrier para esta ciudad específica o revisar problemas de dirección.</li>
+                                                    <li><span class="opacity-50 fw-bold">Gris:</span> No hay datos suficientes (pocos o ningún despacho) para esta combinación.</li>
+                                                </ul>
+                                                <div class="mt-3 p-2 rounded small" style="background: rgba(var(--track-primary-rgb), 0.05); color: var(--track-primary);">
+                                                    <i class="bi bi-lightbulb me-1"></i> <b>Tip Pro:</b> Si una ciudad está en rojo con "Carrier A" pero en verde con "Carrier B", ¡ya sabes cuál elegir la próxima vez!
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div id="heatmapChart" style="width: 100%; height: 400px;"></div>
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', () => {
+                                            const chartDom = document.getElementById('heatmapChart');
+                                            if (!chartDom) return;
+                                            const myChart = echarts.init(chartDom, 'dark');
+                                            const hData = <?= json_encode($detailedStats['advanced']['heatmap']) ?>;
+                                            const option = {
+                                                backgroundColor: 'transparent',
+                                                tooltip: {
+                                                    position: 'top',
+                                                    formatter: function (params) {
+                                                        const val = params.value[2] !== null ? params.value[2] + '%' : 'N/A';
+                                                        return `<b>${hData.carriers[params.value[0]]}</b> en <b>${hData.cities[params.value[1]]}</b><br/>Éxito: ${val}`;
+                                                    }
+                                                },
+                                                grid: { height: '65%', top: '10%', bottom: '15%', left: '15%', right: '5%', containLabel: true },
+                                                xAxis: {
+                                                    type: 'category',
+                                                    data: hData.carriers,
+                                                    splitArea: { show: true },
+                                                    axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10, rotate: 30 }
+                                                },
+                                                yAxis: {
+                                                    type: 'category',
+                                                    data: hData.cities,
+                                                    splitArea: { show: true },
+                                                    axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10 }
+                                                },
+                                                visualMap: {
+                                                    min: 0,
+                                                    max: 100,
+                                                    calculable: true,
+                                                    orient: 'horizontal',
+                                                    left: 'center',
+                                                    bottom: '2%',
+                                                    inRange: { color: ['#ff0055', '#ffcc00', '#00ff88'] },
+                                                    textStyle: { color: 'rgba(255,255,255,0.5)', fontSize: 10 }
+                                                },
+                                                series: [{
+                                                    name: 'Ruta',
+                                                    type: 'heatmap',
+                                                    data: hData.matrix,
+                                                    label: {
+                                                        show: true,
+                                                        formatter: function(p) { return p.value[2] !== null ? p.value[2] + '%' : '-'; },
+                                                        fontSize: 9,
+                                                        color: '#fff'
+                                                    },
+                                                    emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
+                                                }]
+                                            };
+                                            myChart.setOption(option);
+                                            window.addEventListener('resize', () => myChart.resize());
+                                        });
+                                    </script>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
 
@@ -528,6 +823,97 @@ declare(strict_types=1);
                                     </div>
                                 </div>
                             <?php endif; ?>
+
+                            <!-- Mapa de Colombia: Concentración de Pedidos -->
+                            <div class="card border-0 shadow-sm mb-5" style="background: var(--track-surface-high); border: 1px solid var(--track-border) !important;">
+                                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                                    <h6 class="mb-0 fw-bold" style="color: var(--track-text);">
+                                        <i class="bi bi-map me-2" style="color: var(--track-primary);"></i>
+                                        Mapa de Calor Geográfico: Concentración de Ventas
+                                    </h6>
+                                    <p class="small text-muted mb-0 mt-1">Densidad de pedidos por ciudad registrados en el periodo.</p>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div id="colombiaMap" style="width: 100%; height: 500px;"></div>
+                                </div>
+                            </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const chartDom = document.getElementById('colombiaMap');
+                                    if (!chartDom) return;
+                                    const myChart = echarts.init(chartDom, 'dark');
+                                    const geoData = <?= json_encode($detailedStats['advanced']['geoPoints'] ?? []) ?>;
+                                    
+                                    // Asegurar que geoData sea siempre un array válido para evitar errores de JS
+                                    const processedData = Array.isArray(geoData) ? geoData : [];
+
+                                    // URL del GeoJSON de Colombia (Departamentos) - Actualizada a fuente estable
+                                    const colombiaGeoJson = 'https://gist.githubusercontent.com/john-guerra/43c7656821069d00dcbc/raw/colombia.geo.json';
+
+                                    fetch(colombiaGeoJson)
+                                        .then(response => {
+                                            if (!response.ok) throw new Error('Network response was not ok');
+                                            return response.json();
+                                        })
+                                        .then(geoJson => {
+                                            echarts.registerMap('colombia', geoJson);
+                                            
+                                            // Calcular el máximo de forma segura
+                                            const values = processedData.map(d => Number(d.value) || 0);
+                                            const maxValue = values.length > 0 ? Math.max(...values, 1) : 10;
+                                            
+                                            const option = {
+                                                backgroundColor: 'transparent',
+                                                tooltip: {
+                                                    trigger: 'item',
+                                                    formatter: '{b}<br/>Pedidos: {c}'
+                                                },
+                                                visualMap: {
+                                                    min: 0,
+                                                    max: maxValue,
+                                                    left: 'right',
+                                                    top: 'bottom',
+                                                    text: ['Alto', 'Bajo'],
+                                                    calculable: true,
+                                                    inRange: {
+                                                        color: ['#1a1a2e', '#00d2ff', '#00ff88']
+                                                    },
+                                                    textStyle: { color: 'rgba(255,255,255,0.6)' }
+                                                },
+                                                series: [
+                                                    {
+                                                        name: 'Pedidos',
+                                                        type: 'map',
+                                                        map: 'colombia',
+                                                        roam: true,
+                                                        nameProperty: 'NOMBRE_DPT',
+                                                        emphasis: {
+                                                            label: { show: true, color: '#fff' },
+                                                            itemStyle: { areaColor: 'rgba(0, 255, 255, 0.4)' }
+                                                        },
+                                                        itemStyle: {
+                                                            areaColor: 'rgba(255, 255, 255, 0.05)',
+                                                            borderColor: 'rgba(255, 255, 255, 0.1)'
+                                                        },
+                                                        data: processedData
+                                                    }
+                                                ]
+                                            };
+                                            myChart.setOption(option);
+                                        })
+                                        .catch(err => {
+                                            console.error('Error cargando mapa:', err);
+                                            chartDom.innerHTML = `<div class="p-5 text-center text-muted">
+                                                <i class="bi bi-exclamation-triangle mb-2 d-block fs-2"></i>
+                                                Error al cargar el mapa interactivo.<br/>
+                                                <small>${err.message}</small>
+                                            </div>`;
+                                        });
+
+                                    window.addEventListener('resize', () => myChart.resize());
+                                });
+                            </script>
                         <?php endif; ?>
 
                         <?php if ($activeTab === 'productos'): ?>
@@ -677,6 +1063,151 @@ declare(strict_types=1);
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Gráfico de Pareto: Regla del 80/20 -->
+                                <?php if (!empty($detailedStats['advanced']['pareto'])): ?>
+                                    <div class="card border-0 shadow-sm mb-5" style="background: var(--track-surface-high); border: 1px solid var(--track-border) !important;">
+                                        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold" style="color: var(--track-text);">
+                                                    <i class="bi bi-graph-up me-2" style="color: var(--track-warning);"></i>
+                                                    Análisis de Concentración (Pareto): Productos Top
+                                                </h6>
+                                                <p class="small text-muted mb-0 mt-1">Identifica el 20% de productos que generan el 80% de tus ganancias.</p>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-warning border-0 opacity-75" type="button" data-bs-toggle="collapse" data-bs-target="#paretoInfo" aria-expanded="false" style="font-size: 0.75rem;">
+                                                <i class="bi bi-question-circle me-1"></i> ¿Cómo leer?
+                                            </button>
+                                        </div>
+                                        <div class="collapse px-4 pt-2" id="paretoInfo">
+                                            <div class="p-3 rounded-3" style="background: rgba(255, 184, 0, 0.05); border: 1px dashed rgba(255, 184, 0, 0.2);">
+                                                <h7 class="small fw-bold d-block mb-2 text-warning">¡Entiende tu negocio en un vistazo!</h7>
+                                                <ul class="small text-muted mb-0 ps-3">
+                                                    <li><span style="color: #00d2ff; font-weight: bold;">Barras Azules:</span> Representan la ganancia real de cada producto. Están ordenadas de mayor a menor.</li>
+                                                    <li><span style="color: #ffcc00; font-weight: bold;">Línea Amarilla:</span> Es la suma acumulada de tus ganancias. Se lee en el porcentaje de la derecha (0% al 100%).</li>
+                                                    <li><span class="text-white fw-bold">La Clave:</span> Si la línea amarilla sube muy rápido y llega al 80% con solo 2 o 3 productos, significa que esos productos son el **corazón de tu empresa**.</li>
+                                                    <li><span class="text-info fw-bold">Consejo:</span> No permitas que tus productos "Top" se queden sin inventario, ¡son los que pagan las cuentas!</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div id="paretoChart" style="width: 100%; height: 400px;"></div>
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', () => {
+                                            const chartDom = document.getElementById('paretoChart');
+                                            if (!chartDom) return;
+                                            const myChart = echarts.init(chartDom, 'dark');
+                                            
+                                            // New detailed format from service
+                                            const paretoObj = <?= json_encode($detailedStats['advanced']['pareto']) ?>;
+                                            const pData = paretoObj.chartData || [];
+                                            const totalProfit = paretoObj.totalProfit || 0;
+
+                                            const names = pData.map(d => d.name);
+                                            const profits = pData.map(d => d.profit);
+                                            const percentages = pData.map(d => d.percentage);
+
+                                            const option = {
+                                                backgroundColor: 'transparent',
+                                                tooltip: { 
+                                                    trigger: 'axis', 
+                                                    axisPointer: { type: 'shadow' },
+                                                    formatter: function(params) {
+                                                        let res = `<div style="font-weight:bold;margin-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:5px">${params[0].name}</div>`;
+                                                        params.forEach(p => {
+                                                            const val = p.seriesName === '% Cumulativo' ? 
+                                                                p.value.toFixed(1) + '%' : 
+                                                                '$ ' + Number(p.value).toLocaleString('es-CO');
+                                                            
+                                                            let extra = '';
+                                                            if (p.seriesName === 'Profit') {
+                                                                const pct = totalProfit > 0 ? ((p.value / totalProfit) * 100).toFixed(1) : 0;
+                                                                extra = ` (${pct}%)`;
+                                                            }
+
+                                                            res += `<div style="display:flex;justify-content:space-between;gap:20px;font-size:12px;margin-top:2px">
+                                                                <span style="color:${p.color}">${p.seriesName}:</span>
+                                                                <span style="font-weight:bold">${val}${extra}</span>
+                                                            </div>`;
+                                                        });
+                                                        return res;
+                                                    }
+                                                },
+                                                grid: { left: '3%', right: '4%', bottom: '20%', top: '15%', containLabel: true },
+                                                xAxis: {
+                                                    type: 'category',
+                                                    data: names,
+                                                    axisLabel: { 
+                                                        color: 'rgba(255,255,255,0.6)', 
+                                                        fontSize: 10, 
+                                                        rotate: 35,
+                                                        interval: 0,
+                                                        formatter: function(val) {
+                                                            return val.length > 20 ? val.substring(0, 18) + '...' : val;
+                                                        }
+                                                    }
+                                                },
+                                                yAxis: [
+                                                    {
+                                                        type: 'value',
+                                                        name: 'Profit (COP)',
+                                                        max: totalProfit > 0 ? totalProfit : 'auto',
+                                                        splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
+                                                        axisLabel: { 
+                                                            formatter: (v) => '$ ' + (v >= 1000000 ? (v/1000000).toFixed(1) + 'M' : v.toLocaleString('es-CO')),
+                                                            color: 'rgba(255,255,255,0.6)' 
+                                                        }
+                                                    },
+                                                    {
+                                                        type: 'value',
+                                                        name: '% Cum.',
+                                                        min: 0, max: 100,
+                                                        splitLine: { show: false },
+                                                        axisLabel: { formatter: '{value} %', color: 'rgba(255,255,255,0.6)' }
+                                                    }
+                                                ],
+                                                series: [
+                                                    { 
+                                                        name: 'Profit', 
+                                                        type: 'bar', 
+                                                        itemStyle: { 
+                                                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                                                { offset: 0, color: '#00d2ff' },
+                                                                { offset: 1, color: '#0095ff' }
+                                                            ]),
+                                                            borderRadius: [4, 4, 0, 0] 
+                                                        },
+                                                        label: {
+                                                            show: true,
+                                                            position: 'top',
+                                                            color: '#fff',
+                                                            fontSize: 9,
+                                                            formatter: (p) => {
+                                                                const pct = totalProfit > 0 ? ((p.value / totalProfit) * 100).toFixed(0) : 0;
+                                                                return pct + '%';
+                                                            }
+                                                        },
+                                                        data: profits 
+                                                    },
+                                                    { 
+                                                        name: '% Cumulativo', 
+                                                        type: 'line', 
+                                                        yAxisIndex: 1, 
+                                                        symbolSize: 8,
+                                                        lineStyle: { width: 3, shadowBlur: 10, shadowColor: 'rgba(255, 204, 0, 0.5)' },
+                                                        itemStyle: { color: '#ffcc00' }, 
+                                                        data: percentages 
+                                                    }
+                                                ]
+                                            };
+                                            myChart.setOption(option);
+                                            window.addEventListener('resize', () => myChart.resize());
+                                        });
+                                    </script>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endif; ?>
                         <?php if ($activeTab === 'finanzas'): ?>
@@ -790,6 +1321,8 @@ declare(strict_types=1);
                                 </div>
                             <?php endif; ?>
 
+
+
                             <h5 class="fw-bold mb-3 px-1" id="section-monthly-details"><i
                                     class="bi bi-cash-stack me-2 text-success"></i>Detalle Financiero por Mes</h5>
 
@@ -876,6 +1409,187 @@ declare(strict_types=1);
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <div class="row g-4 mb-4">
+                                                    <div class="col-12">
+                                                        <div class="card border-0 shadow-sm" style="background: var(--track-surface-high); border: 1px solid var(--track-border) !important;">
+                                                            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-start">
+                                                                <div>
+                                                                    <h6 class="mb-0 fw-bold" style="color: var(--track-text);">
+                                                                        <i class="bi bi-graph-down-arrow me-2" style="color: var(--track-danger);"></i>
+                                                                        Resumen de Operación: Costos vs Beneficios
+                                                                    </h6>
+                                                                    <p class="small text-muted mb-0 mt-1">Cómo se distribuyen tus ingresos brutos frente a los gastos reales.</p>
+                                                                </div>
+                                                                <button class="btn btn-sm btn-outline-danger border-0 opacity-75" type="button" data-bs-toggle="collapse" data-bs-target="#waterfallInfo" aria-expanded="false" style="font-size: 0.75rem;">
+                                                                    <i class="bi bi-question-circle me-1"></i> ¿Cómo leer?
+                                                                </button>
+                                                            </div>
+                                                            <div class="collapse px-4 pt-2" id="waterfallInfo">
+                                                                <div class="p-3 rounded-3" style="background: rgba(255, 0, 85, 0.05); border: 1px dashed rgba(255, 0, 85, 0.2);">
+                                                                    <h7 class="small fw-bold d-block mb-2 text-danger">Interpretación de Cascada:</h7>
+                                                                    <p class="small text-muted mb-3">Esta gráfica muestra cómo se "gasta" tu dinero desde que vendes hasta que te queda la utilidad neta.</p>
+                                                                    <ul class="small text-muted mb-0 ps-3">
+                                                                        <li><span style="color: #00d2ff; font-weight: bold;">Azul (Ventas Brutas):</span> Es tu punto de partida, el total de dinero que entró.</li>
+                                                                        <li><span style="color: #ff0055; font-weight: bold;">Rojas (Gastos):</span> Son escalones hacia abajo. Cada uno resta valor al total original.</li>
+                                                                        <li><span style="color: #00ff88; font-weight: bold;">Verde (Profit Neto):</span> Es lo que queda al final. <b>Si está por debajo de la línea gris (0), significa que hubo pérdidas.</b></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body p-0">
+                                                                <div id="waterfallChart-<?= $idx ?>" style="width: 100%; height: 350px;"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <script>
+                                                    (function() {
+                                                        const chartDom = document.getElementById('waterfallChart-<?= $idx ?>');
+                                                        if (!chartDom) return;
+                                                        const myChart = echarts.init(chartDom, 'dark');
+                                                        
+                                                        const rawData = [
+                                                            { name: 'Ventas Brutas', value: <?= (float)$m['ingresos_brutos'] ?>, type: 'plus' },
+                                                            { name: 'Costo Prod.', value: <?= (float)$m['costos_producto'] ?>, type: 'minus' },
+                                                            { name: 'Envíos OK', value: <?= (float)$m['costos_envio_exito'] ?>, type: 'minus' },
+                                                            { name: 'Costo Devs.', value: <?= (float)$m['costos_devolucion'] ?>, type: 'minus' },
+                                                            { name: 'Gasto Pauta', value: <?= (float)$m['pauta'] ?>, type: 'minus' },
+                                                            { name: 'Profit Neto', value: <?= (float)$m['profit'] ?>, type: 'total' }
+                                                        ];
+
+                                                        const help = [];
+                                                        const positive = [];
+                                                        const negative = [];
+                                                        const total = [];
+                                                        let current = 0;
+
+                                                        for (let i = 0; i < rawData.length; i++) {
+                                                            const item = rawData[i];
+                                                            if (item.type === 'plus') {
+                                                                help.push(0);
+                                                                positive.push(item.value);
+                                                                negative.push('-');
+                                                                total.push('-');
+                                                                current = item.value;
+                                                            } else if (item.type === 'minus') {
+                                                                current -= item.value;
+                                                                help.push(current);
+                                                                positive.push('-');
+                                                                negative.push(item.value);
+                                                                total.push('-');
+                                                            } else {
+                                                                help.push(0);
+                                                                positive.push('-');
+                                                                negative.push('-');
+                                                                total.push(item.value);
+                                                            }
+                                                        }
+
+                                                        const option = {
+                                                            backgroundColor: 'transparent',
+                                                            tooltip: {
+                                                                trigger: 'axis',
+                                                                axisPointer: { type: 'shadow' },
+                                                                formatter: function (params) {
+                                                                    let tar = (params[1] && params[1].value !== '-') ? params[1] : 
+                                                                              ((params[2] && params[2].value !== '-') ? params[2] : params[3]);
+                                                                    if (!tar) return '';
+                                                                    const baseVal = rawData[0].value || 1;
+                                                                    const pct = ((Math.abs(tar.value) / baseVal) * 100).toFixed(1);
+                                                                    return `<b>${tar.name}</b><br/>Valor: $${Number(tar.value).toLocaleString('es-CO')}<br/>Impacto: ${pct}% de las ventas`;
+                                                                },
+                                                                backgroundColor: 'rgba(20, 20, 30, 0.9)',
+                                                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                                                textStyle: { color: '#fff' }
+                                                            },
+                                                            grid: { left: '3%', right: '4%', bottom: '25%', top: '20%', containLabel: true },
+                                                            xAxis: {
+                                                                type: 'category',
+                                                                data: rawData.map(d => d.name),
+                                                                axisLabel: { color: 'rgba(255, 255, 255, 0.6)', fontSize: 10, rotate: 45 }
+                                                            },
+                                                            yAxis: {
+                                                                type: 'value',
+                                                                splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
+                                                                axisLabel: { color: 'rgba(255, 255, 255, 0.6)' }
+                                                            },
+                                                            series: [
+                                                                {
+                                                                    name: 'Placeholder',
+                                                                    type: 'bar',
+                                                                    stack: 'Total',
+                                                                    itemStyle: { borderColor: 'transparent', color: 'transparent' },
+                                                                    emphasis: { itemStyle: { borderColor: 'transparent', color: 'transparent' } },
+                                                                    data: help
+                                                                },
+                                                                {
+                                                                    name: 'Ingreso',
+                                                                    type: 'bar',
+                                                                    stack: 'Total',
+                                                                    label: { 
+                                                                        show: true, 
+                                                                        position: 'top', 
+                                                                        formatter: (p) => {
+                                                                            if (p.value === '-' || p.value === 0) return '';
+                                                                            const base = rawData[0].value || 1;
+                                                                            const pct = ((p.value / base) * 100).toFixed(1);
+                                                                            return `$${(p.value/1000).toFixed(0)}k\n(${pct}%)`;
+                                                                        }, 
+                                                                        color: '#fff', 
+                                                                        fontSize: 10 
+                                                                    },
+                                                                    itemStyle: { color: '#00d2ff', borderRadius: [4, 4, 0, 0] },
+                                                                    data: positive
+                                                                },
+                                                                {
+                                                                    name: 'Egreso/Pérdida',
+                                                                    type: 'bar',
+                                                                    stack: 'Total',
+                                                                    label: { 
+                                                                        show: true, 
+                                                                        position: 'bottom', 
+                                                                        formatter: (p) => {
+                                                                            if (p.value === '-' || p.value === 0) return '';
+                                                                            const base = rawData[0].value || 1;
+                                                                            const pct = ((p.value / base) * 100).toFixed(1);
+                                                                            return `-$${(p.value/1000).toFixed(0)}k\n(${pct}%)`;
+                                                                        }, 
+                                                                        color: '#ff4444', 
+                                                                        fontSize: 10 
+                                                                    },
+                                                                    itemStyle: { color: '#ff0055', borderRadius: [4, 4, 0, 0] },
+                                                                    data: negative
+                                                                },
+                                                                {
+                                                                    name: 'Neto',
+                                                                    type: 'bar',
+                                                                    stack: 'Total',
+                                                                    label: { 
+                                                                        show: true, 
+                                                                        position: 'top', 
+                                                                        formatter: (p) => {
+                                                                            if (p.value === '-' || p.value === 0) return '';
+                                                                            const base = rawData[0].value || 1;
+                                                                            const val = Number(p.value);
+                                                                            const pct = ((Math.abs(val) / base) * 100).toFixed(1);
+                                                                            return (val < 0 ? '-' : '') + '$' + (Math.abs(val)/1000).toFixed(0) + 'k\n(' + pct + '%)';
+                                                                        }, 
+                                                                        color: '#fff', 
+                                                                        fontWeight: 'bold' 
+                                                                    },
+                                                                    itemStyle: { 
+                                                                        color: (p) => p.value < 0 ? '#ff4444' : '#00ff88', 
+                                                                        borderRadius: [4, 4, 0, 0] 
+                                                                    },
+                                                                    data: total
+                                                                }
+                                                            ]
+                                                        };
+                                                        myChart.setOption(option);
+                                                        window.addEventListener('resize', () => myChart.resize());
+                                                    })();
+                                                </script>
 
                                                 <div class="row g-4">
                                                     <!-- Desglose de Operación -->
@@ -1024,6 +1738,24 @@ declare(strict_types=1);
                                     </div>
                                 <?php endforeach; ?>
                             </div>
+
+                            <script>
+                                // Fix para gráficas dentro de acordeones (ECharts necesita resize al mostrarse)
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const accordion = document.getElementById('statsAccordion');
+                                    if (accordion) {
+                                        accordion.addEventListener('shown.bs.collapse', function (event) {
+                                            const chartDiv = event.target.querySelector('[id^="waterfallChart-"]');
+                                            if (chartDiv) {
+                                                const chartInstance = echarts.getInstanceByDom(chartDiv);
+                                                if (chartInstance) {
+                                                    chartInstance.resize();
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            </script>
                         <?php endif; ?>
                     <?php endif; ?> <!-- Closes detailedStats (263) -->
                 <?php endif; ?> <!-- Closes else (225) -->

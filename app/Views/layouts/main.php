@@ -42,6 +42,9 @@ $lang = htmlspecialchars((string) ($app['locale'] ?? 'es'), ENT_QUOTES, 'UTF-8')
 
     <!-- Alpine.js (Lite Reactivity) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Apache ECharts (Advanced Analytics) -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <a class="visually-hidden-focusable position-absolute top-0 start-0 p-3 m-2 bg-body shadow-sm rounded text-decoration-none z-3" href="#main-content">Saltar al contenido principal</a>

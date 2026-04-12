@@ -39,9 +39,16 @@ final class StatsController extends Controller
             switch ($tab) {
                 case 'consolidado':
                     $data = $statsService->calculateGlobal($orders);
+                    // Necesitamos la historia mensual para las gráficas estratégicas del consolidado
+                    $adRepo = new AdSpendRepository($pdo);
+                    $tiendaId = (string) session()->get('tienda_id', 'global');
+                    $pautas = $adRepo->all($tiendaId);
+                    $months = $statsService->calculateMonthlyFinancials($orders, $pautas);
                     break;
                 case 'logistica':
                     $data = $statsService->calculateLogistics($orders);
+                    // También cargamos meses básicos para la tabla de telemetría si es necesario
+                    // (calculateLogistics ya devuelve su propio array de meses pero es diferente)
                     break;
                 case 'geografia':
                     $data = $statsService->calculateGeographic($orders);
@@ -55,58 +62,10 @@ final class StatsController extends Controller
                     $products = $productService->getMultiple($pIds);
                     break;
                 case 'finanzas':
-                    // Para finanzas necesitamos procesar meses y pautas
-                    $tiendaId = (string) session()->get('tienda_id', 'global');
                     $adRepo = new AdSpendRepository($pdo);
+                    $tiendaId = (string) session()->get('tienda_id', 'global');
                     $pautas = $adRepo->all($tiendaId);
-                    
-                    $grouped = [];
-                    foreach ($orders as $o) {
-                        $date = $o['mainEventDate'] ?? '';
-                        if (is_string($date) && preg_match('/^(\d{4}-\d{2})/', $date, $m)) {
-                            $mes = $m[1];
-                        } else { continue; }
-
-                        if (!isset($grouped[$mes])) {
-                            $grouped[$mes] = [
-                                'mes' => $mes, 'despachadas' => 0, 'entregadas' => 0, 'devueltas' => 0,
-                                'en_proceso' => 0, 'ingresos_brutos' => 0.0, 'costos_producto' => 0.0,
-                                'costos_envio_exito' => 0.0, 'costos_devolucion' => 0.0,
-                            ];
-                        }
-
-                        $st = (int) ($o['statusCode'] ?? 0);
-                        $grouped[$mes]['despachadas']++;
-                        $total = (float) ($o['total'] ?? 0.0);
-                        $costo = (float) ($o['costo'] ?? 0.0);
-                        $cEnvio = (float) ($o['costoEnvio'] ?? 0.0);
-
-                        if ($st === 3 || $st === 5) {
-                            $grouped[$mes]['entregadas']++;
-                            $grouped[$mes]['ingresos_brutos'] += $total;
-                            $grouped[$mes]['costos_producto'] += $costo;
-                            $grouped[$mes]['costos_envio_exito'] += $cEnvio;
-                        } elseif ($st === 4) {
-                            $grouped[$mes]['devueltas']++;
-                            $grouped[$mes]['costos_devolucion'] += $cEnvio;
-                        } elseif ($st === 2) {
-                            $grouped[$mes]['en_proceso']++;
-                        }
-                    }
-
-                    foreach ($grouped as $mes => $mdata) {
-                        $pauta = (float)($pautas[$mes] ?? 0.0);
-                        $mdata['pauta'] = $pauta;
-                        $mdata['utilidad_bruta'] = $mdata['ingresos_brutos'] - $mdata['costos_producto'] - $mdata['costos_envio_exito'];
-                        $mdata['profit'] = $mdata['utilidad_bruta'] - $mdata['costos_devolucion'] - $pauta;
-                        $mdata['efectividad_pct'] = $mdata['despachadas'] > 0 ? round(($mdata['entregadas'] / $mdata['despachadas']) * 100, 1) : 0;
-                        $mdata['devolucion_pct'] = $mdata['despachadas'] > 0 ? round(($mdata['devueltas'] / $mdata['despachadas']) * 100, 1) : 0;
-                        $mdata['roas'] = $pauta > 0 ? round($mdata['ingresos_brutos'] / $pauta, 2) : 0;
-                        $mdata['cpa'] = $mdata['entregadas'] > 0 ? round($pauta / $mdata['entregadas'], 0) : 0;
-                        $mdata['margen_unidad'] = $mdata['entregadas'] > 0 ? round($mdata['profit'] / $mdata['entregadas'], 0) : 0;
-                        $months[] = $mdata;
-                    }
-                    usort($months, fn($a, $b) => strcmp($b['mes'], $a['mes']));
+                    $months = $statsService->calculateMonthlyFinancials($orders, $pautas);
 
                     $globalFin = ['pauta' => 0.0, 'costos_devolucion' => 0.0, 'profit' => 0.0, 'ingresos_brutos' => 0.0, 'utilidad_bruta' => 0.0, 'entregadas' => 0];
                     foreach ($months as $m) {
@@ -136,6 +95,13 @@ final class StatsController extends Controller
             ]);
             return;
         }
+
+        // Advanced Analytics for ECharts
+        $data['advanced'] = [
+            'heatmap' => $tab === 'logistica' ? $statsService->calculateCarrierCityMatrix($orders) : null,
+            'pareto' => $tab === 'productos' ? $statsService->calculateProductPareto($data['productStats'] ?? [], $products) : null,
+            'geoPoints' => $tab === 'geografia' ? $statsService->calculateGeographicPoints($orders) : null,
+        ];
 
         $this->view('estadisticas', [
             'title' => 'Estadísticas y Finanzas',
