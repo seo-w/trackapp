@@ -16,8 +16,18 @@ final class StatsController extends Controller
     {
         $this->requireAuth();
         $tab = $_GET['tab'] ?? 'consolidado';
-        $validTabs = ['consolidado', 'logistica', 'geografia', 'productos', 'finanzas'];
+        $validTabs = ['consolidado', 'logistica', 'geografia', 'productos', 'finanzas', 'tutorial'];
         if (!in_array($tab, $validTabs)) { $tab = 'consolidado'; }
+
+        // Filtro de fechas
+        $fechaDesde = $_GET['fecha_desde'] ?? null;
+        $fechaHasta = $_GET['fecha_hasta'] ?? null;
+
+        // Por defecto últimos 30 días
+        if (empty($fechaDesde) || empty($fechaHasta)) {
+            $fechaHasta = date('Y-m-d');
+            $fechaDesde = date('Y-m-d', strtotime('-30 days'));
+        }
 
         try {
             $pdo = db()->pdo();
@@ -26,7 +36,7 @@ final class StatsController extends Controller
             $queryService = new OrderListQueryService($merkaweb);
             
             // Siempre traemos las órdenes base (es inevitable para todas las métricas actuales)
-            $out = $queryService->fetchAndNormalize([2, 3, 4, 5]);
+            $out = $queryService->fetchAndNormalize([2, 3, 4, 5], $fechaDesde, $fechaHasta);
             $orders = $out['orders'];
 
             $statsService = new OrderStatisticsService();
@@ -92,6 +102,8 @@ final class StatsController extends Controller
                 'detailedStats' => null,
                 'globalFinancials' => null,
                 'products' => [],
+                'fechaDesde' => $fechaDesde,
+                'fechaHasta' => $fechaHasta,
             ]);
             return;
         }
@@ -113,6 +125,8 @@ final class StatsController extends Controller
             'products' => $products,
             'error' => null,
             'hasData' => !empty($orders),
+            'fechaDesde' => $fechaDesde,
+            'fechaHasta' => $fechaHasta,
         ]);
     }
 

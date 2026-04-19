@@ -14,6 +14,37 @@ declare(strict_types=1);
 
 <div class="container pb-5">
 
+    <script>
+        // Sistema Global de Gestión de Gráficos para Sincronización de Temas
+        window.trackCharts = window.trackCharts || {
+            registry: [],
+            add: function(id, initFn) {
+                this.registry.push({ id, init: initFn });
+                return initFn();
+            },
+            refreshAll: function() {
+                this.registry.forEach(item => {
+                    const dom = document.getElementById(item.id);
+                    if (dom) {
+                        const existing = echarts.getInstanceByDom(dom);
+                        if (existing) existing.dispose();
+                        item.init();
+                    }
+                });
+            }
+        };
+
+        // Observador global de tema
+        const globalThemeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'data-theme') {
+                    window.trackCharts.refreshAll();
+                }
+            });
+        });
+        globalThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    </script>
+
     <style>
         :root {
             --track-stats-accent: #00ffff;
@@ -169,6 +200,67 @@ declare(strict_types=1);
             border: 1px solid rgba(255, 184, 0, 0.3) !important;
             color: #ffcc00 !important;
         }
+
+        /* Filter Bar Styles */
+        .stats-filter-card {
+            background: var(--track-surface);
+            backdrop-filter: var(--track-blur);
+            -webkit-backdrop-filter: var(--track-blur);
+            border: 1px solid var(--track-border);
+            border-radius: 1.25rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-input-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .filter-field label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--track-muted);
+            margin-left: 0.25rem;
+        }
+
+        .filter-control {
+            background: rgba(var(--track-primary-rgb, 0, 255, 255), 0.03);
+            border: 1px solid var(--track-border);
+            border-radius: 10px;
+            color: var(--track-text);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .filter-control:focus {
+            border-color: var(--track-primary);
+            box-shadow: 0 0 10px var(--track-stats-glow);
+            background: rgba(var(--track-primary-rgb, 0, 255, 255), 0.08);
+        }
+
+        .btn-filter-apply {
+            height: 42px;
+            padding: 0 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+            margin-top: auto;
+        }
     </style>
 
     <div x-data="{ 
@@ -215,6 +307,12 @@ declare(strict_types=1);
                                 :class="{ 'active': activeTab === 'finanzas' }">
                                 <i class="bi bi-cash-stack"></i> Finanzas y Pauta
                             </a>
+
+                            <div class="nav-stats-category">Soporte</div>
+                            <a class="nav-link" href="/estadisticas?tab=tutorial"
+                                :class="{ 'active': activeTab === 'tutorial' }">
+                                <i class="bi bi-journal-richtext"></i> Guía y Tutorial
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -223,6 +321,40 @@ declare(strict_types=1);
             <!-- Main Content Area -->
             <!-- Main Content Area Column -->
             <div class="col-lg-9">
+
+                <!-- Filtro de Fechas -->
+                <?php if ($activeTab !== 'tutorial'): ?>
+                    <div class="stats-filter-card shadow-sm animate__animated animate__fadeIn">
+                        <form action="/estadisticas" method="GET" class="filter-input-group">
+                            <input type="hidden" name="tab" value="<?= htmlspecialchars($activeTab, ENT_QUOTES, 'UTF-8') ?>">
+                            
+                            <div class="filter-field">
+                                <label for="fecha_desde">Desde</label>
+                                <input type="date" id="fecha_desde" name="fecha_desde" class="filter-control" 
+                                       value="<?= htmlspecialchars($fechaDesde ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                            </div>
+
+                            <div class="filter-field">
+                                <label for="fecha_hasta">Hasta</label>
+                                <input type="date" id="fecha_hasta" name="fecha_hasta" class="filter-control" 
+                                       value="<?= htmlspecialchars($fechaHasta ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-filter-apply shadow-sm">
+                                <i class="bi bi-filter-right me-2"></i> Actualizar
+                            </button>
+                            
+                            <?php if (isset($fechaDesde) && isset($fechaHasta)): ?>
+                                <div class="ms-auto d-none d-md-block text-end">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 px-3 py-2 rounded-3">
+                                        <i class="bi bi-calendar-check me-2"></i>
+                                        Visualizando: <?= date('d M', strtotime($fechaDesde)) ?> - <?= date('d M', strtotime($fechaHasta)) ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </form>
+                    </div>
+                <?php endif; ?>
 
 
 
@@ -450,103 +582,156 @@ declare(strict_types=1);
 
                                 <script>
                                     document.addEventListener('DOMContentLoaded', () => {
-                                        const trendMonths = [...<?= json_encode($months ?? []) ?>].reverse(); // Cronológico
-                                        const labels = trendMonths.map(m => m.label);
-                                        const profits = trendMonths.map(m => m.profit);
-                                        const pauta = trendMonths.map(m => m.pauta);
-                                        const roas = trendMonths.map(m => m.roas);
-                                        const utilBruta = trendMonths.map(m => m.utilidad_bruta);
-                                        const efectividad = trendMonths.map(m => m.efectividad_pct);
-                                        const devolucion = trendMonths.map(m => m.devolucion_pct);
+                                        // Sistema de sincronización de temas para ECharts
+                                        const getEChartsTheme = () => document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : null;
+                                        let chartInstances = [];
 
-                                        let runningProfit = 0;
-                                        const cumulativeProfit = profits.map(v => {
-                                            runningProfit += v;
-                                            return runningProfit;
+                                        function initConsolidadoCharts() {
+                                            // Limpiar instancias previas
+                                            chartInstances.forEach(c => {
+                                                if (c && typeof c.dispose === 'function') c.dispose();
+                                            });
+                                            chartInstances = [];
+
+                                            const currentTheme = getEChartsTheme();
+                                            const trendMonths = [...<?= json_encode($months ?? []) ?>].reverse(); // Cronológico
+                                            const labels = trendMonths.map(m => m.label);
+                                            const profits = trendMonths.map(m => m.profit);
+                                            const pauta = trendMonths.map(m => m.pauta);
+                                            const roas = trendMonths.map(m => m.roas);
+                                            const utilBruta = trendMonths.map(m => m.utilidad_bruta);
+                                            const efectividad = trendMonths.map(m => m.efectividad_pct);
+                                            const devolucion = trendMonths.map(m => m.devolucion_pct);
+
+                                            let runningProfit = 0;
+                                            const cumulativeProfit = profits.map(v => {
+                                                runningProfit += v;
+                                                return runningProfit;
+                                            });
+
+                                            const commonGrid = { left: '8%', right: '8%', bottom: '15%', top: '15%', containLabel: true };
+                                            
+                                            // Tooltip dinámico basado en tema
+                                            const isDark = currentTheme === 'dark';
+                                            const commonTool = { 
+                                                trigger: 'axis', 
+                                                axisPointer: { type: 'cross' }, 
+                                                backgroundColor: isDark ? 'rgba(20, 20, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                                                textStyle: { color: isDark ? '#fff' : '#1e293b' }
+                                            };
+
+                                            const axisLabelColor = isDark ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)') : 'rgba(0,0,0,0.6)';
+                                            const splitLineColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+                                            // 1. Profit Neto Acumulado
+                                            const profitDom = document.getElementById('trendChartProfit');
+                                            if (profitDom) {
+                                                const profitChart = echarts.init(profitDom, currentTheme);
+                                                profitChart.setOption({
+                                                    backgroundColor: 'transparent',
+                                                    tooltip: commonTool,
+                                                    grid: commonGrid,
+                                                    xAxis: { type: 'category', data: labels, axisLabel: { color: axisLabelColor } },
+                                                    yAxis: [
+                                                        { type: 'value', name: 'Mensual', splitLine: { lineStyle: { color: splitLineColor } } },
+                                                        { type: 'value', name: 'Acumulado' }
+                                                    ],
+                                                    series: [
+                                                        { 
+                                                            name: 'Profit Mensual', 
+                                                            type: 'bar', 
+                                                            data: profits,
+                                                            itemStyle: { 
+                                                                color: (p) => p.value >= 0 ? '#10b981' : '#ef4444',
+                                                                borderRadius: [4, 4, 0, 0]
+                                                            }
+                                                        },
+                                                        { name: 'Acumulado', type: 'line', yAxisIndex: 1, data: cumulativeProfit, step: 'start', smooth: true, lineStyle: { width: 3, color: '#0ea5e9' }, symbolSize: 8, itemStyle: { color: '#0ea5e9' } }
+                                                    ]
+                                                });
+                                                chartInstances.push(profitChart);
+                                            }
+
+                                            // 3. ROAS vs Gasto Pauta
+                                            const roasDom = document.getElementById('trendChartRoas');
+                                            if (roasDom) {
+                                                const roasChart = echarts.init(roasDom, currentTheme);
+                                                roasChart.setOption({
+                                                    backgroundColor: 'transparent',
+                                                    tooltip: commonTool,
+                                                    grid: commonGrid,
+                                                    xAxis: { type: 'category', data: labels, axisLabel: { color: axisLabelColor } },
+                                                    yAxis: [
+                                                        { type: 'value', name: 'Gasto Pauta ($)', splitLine: { lineStyle: { color: splitLineColor } } },
+                                                        { type: 'value', name: 'ROAS', min: 0 }
+                                                    ],
+                                                    series: [
+                                                        { name: 'Gasto Pauta', type: 'bar', data: pauta, itemStyle: { color: '#6366f1', borderRadius: [4, 4, 0, 0] } },
+                                                        { name: 'ROAS', type: 'line', yAxisIndex: 1, data: roas, symbolSize: 10, lineStyle: { width: 4, color: '#f59e0b' }, itemStyle: { color: '#f59e0b' } }
+                                                    ]
+                                                });
+                                                chartInstances.push(roasChart);
+                                            }
+
+                                            // 4. Efectividad de Entrega
+                                            const deliveryDom = document.getElementById('trendChartDelivery');
+                                            if (deliveryDom) {
+                                                const deliveryChart = echarts.init(deliveryDom, currentTheme);
+                                                deliveryChart.setOption({
+                                                    backgroundColor: 'transparent',
+                                                    tooltip: commonTool,
+                                                    grid: commonGrid,
+                                                    xAxis: { type: 'category', data: labels, axisLabel: { color: axisLabelColor } },
+                                                    yAxis: { type: 'value', name: '%', min: 0, max: 100, splitLine: { lineStyle: { color: splitLineColor } } },
+                                                    series: [
+                                                        { name: '% Entregado', type: 'line', data: efectividad, smooth: true, lineStyle: { width: 4, color: '#20c997' }, itemStyle: { color: '#20c997' } },
+                                                        { name: '% Devuelto', type: 'line', data: devolucion, smooth: true, lineStyle: { width: 3, type: 'dashed', color: '#ff4444' }, itemStyle: { color: '#ff4444' } }
+                                                    ]
+                                                });
+                                                chartInstances.push(deliveryChart);
+                                            }
+
+                                            // 5. Devolución vs Utilidad
+                                            const utilityDom = document.getElementById('trendChartUtility');
+                                            if (utilityDom) {
+                                                const utilityChart = echarts.init(utilityDom, currentTheme);
+                                                utilityChart.setOption({
+                                                    backgroundColor: 'transparent',
+                                                    tooltip: commonTool,
+                                                    grid: commonGrid,
+                                                    xAxis: { type: 'category', data: labels, axisLabel: { color: axisLabelColor } },
+                                                    yAxis: [
+                                                        { type: 'value', name: 'Utilidad Bruta ($)', splitLine: { lineStyle: { color: splitLineColor } } },
+                                                        { type: 'value', name: '% Devolución', min: 0 }
+                                                    ],
+                                                    series: [
+                                                        { name: 'Utilidad Bruta', type: 'bar', data: utilBruta, itemStyle: { color: '#3b82f6', borderRadius: [4, 4, 0, 0] } },
+                                                        { name: '% Devolución', type: 'line', yAxisIndex: 1, data: devolucion, symbolSize: 10, lineStyle: { width: 4, color: '#ea580c' }, itemStyle: { color: '#ea580c' } }
+                                                    ]
+                                                });
+                                                chartInstances.push(utilityChart);
+                                            }
+                                        }
+
+                                        // Observador para cambios de tema
+                                        const themeObserver = new MutationObserver((mutations) => {
+                                            mutations.forEach((mutation) => {
+                                                if (mutation.attributeName === 'data-theme') {
+                                                    initConsolidadoCharts();
+                                                }
+                                            });
                                         });
-
-                                        const commonGrid = { left: '8%', right: '8%', bottom: '15%', top: '15%', containLabel: true };
-                                        const commonTool = { trigger: 'axis', axisPointer: { type: 'cross' }, backgroundColor: 'rgba(20, 20, 30, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)', textStyle: { color: '#fff' } };
-
-                                        // 1. Profit Neto Acumulado
-                                        const profitChart = echarts.init(document.getElementById('trendChartProfit'), 'dark');
-                                        profitChart.setOption({
-                                            backgroundColor: 'transparent',
-                                            tooltip: commonTool,
-                                            grid: commonGrid,
-                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
-                                            yAxis: [
-                                                { type: 'value', name: 'Mensual', splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
-                                                { type: 'value', name: 'Acumulado' }
-                                            ],
-                                            series: [
-                                                { 
-                                                    name: 'Profit Mensual', 
-                                                    type: 'bar', 
-                                                    data: profits,
-                                                    itemStyle: { 
-                                                        color: (p) => p.value >= 0 ? '#00ff88' : '#ff4444',
-                                                        borderRadius: [4, 4, 0, 0]
-                                                    }
-                                                },
-                                                { name: 'Acumulado', type: 'line', yAxisIndex: 1, data: cumulativeProfit, step: 'start', smooth: true, lineStyle: { width: 3, color: '#00d2ff' }, symbolSize: 8, itemStyle: { color: '#00d2ff' } }
-                                            ]
-                                        });
-
-                                        // 3. ROAS vs Gasto Pauta
-                                        const roasChart = echarts.init(document.getElementById('trendChartRoas'), 'dark');
-                                        roasChart.setOption({
-                                            backgroundColor: 'transparent',
-                                            tooltip: commonTool,
-                                            grid: commonGrid,
-                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
-                                            yAxis: [
-                                                { type: 'value', name: 'Gasto Pauta ($)', splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
-                                                { type: 'value', name: 'ROAS', min: 0 }
-                                            ],
-                                            series: [
-                                                { name: 'Gasto Pauta', type: 'bar', data: pauta, itemStyle: { color: '#6366f1', borderRadius: [4, 4, 0, 0] } },
-                                                { name: 'ROAS', type: 'line', yAxisIndex: 1, data: roas, symbolSize: 10, lineStyle: { width: 4, color: '#f59e0b' }, itemStyle: { color: '#f59e0b' } }
-                                            ]
-                                        });
-
-                                        // 4. Efectividad de Entrega
-                                        const deliveryChart = echarts.init(document.getElementById('trendChartDelivery'), 'dark');
-                                        deliveryChart.setOption({
-                                            backgroundColor: 'transparent',
-                                            tooltip: commonTool,
-                                            grid: commonGrid,
-                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
-                                            yAxis: { type: 'value', name: '%', min: 0, max: 100, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
-                                            series: [
-                                                { name: '% Entregado', type: 'line', data: efectividad, smooth: true, lineStyle: { width: 4, color: '#20c997' }, itemStyle: { color: '#20c997' } },
-                                                { name: '% Devuelto', type: 'line', data: devolucion, smooth: true, lineStyle: { width: 3, type: 'dashed', color: '#ff4444' }, itemStyle: { color: '#ff4444' } }
-                                            ]
-                                        });
-
-                                        // 5. Devolución vs Utilidad
-                                        const utilityChart = echarts.init(document.getElementById('trendChartUtility'), 'dark');
-                                        utilityChart.setOption({
-                                            backgroundColor: 'transparent',
-                                            tooltip: commonTool,
-                                            grid: commonGrid,
-                                            xAxis: { type: 'category', data: labels, axisLabel: { color: 'rgba(255,255,255,0.6)' } },
-                                            yAxis: [
-                                                { type: 'value', name: 'Utilidad Bruta ($)', splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
-                                                { type: 'value', name: '% Devolución', min: 0 }
-                                            ],
-                                            series: [
-                                                { name: 'Utilidad Bruta', type: 'bar', data: utilBruta, itemStyle: { color: '#3b82f6', borderRadius: [4, 4, 0, 0] } },
-                                                { name: '% Devolución', type: 'line', yAxisIndex: 1, data: devolucion, symbolSize: 10, lineStyle: { width: 4, color: '#ea580c' }, itemStyle: { color: '#ea580c' } }
-                                            ]
-                                        });
+                                        themeObserver.observe(document.documentElement, { attributes: true });
 
                                         window.addEventListener('resize', () => {
-                                            profitChart.resize();
-                                            roasChart.resize();
-                                            deliveryChart.resize();
-                                            utilityChart.resize();
+                                            chartInstances.forEach(c => {
+                                                if (c && typeof c.resize === 'function') c.resize();
+                                            });
                                         });
+
+                                        // Inicio
+                                        initConsolidadoCharts();
                                     });
                                 </script>
                             </div>
@@ -685,57 +870,88 @@ declare(strict_types=1);
 
                                     <script>
                                         document.addEventListener('DOMContentLoaded', () => {
-                                            const chartDom = document.getElementById('heatmapChart');
-                                            if (!chartDom) return;
-                                            const myChart = echarts.init(chartDom, 'dark');
-                                            const hData = <?= json_encode($detailedStats['advanced']['heatmap']) ?>;
-                                            const option = {
-                                                backgroundColor: 'transparent',
-                                                tooltip: {
-                                                    position: 'top',
-                                                    formatter: function (params) {
-                                                        const val = params.value[2] !== null ? params.value[2] + '%' : 'N/A';
-                                                        return `<b>${hData.carriers[params.value[0]]}</b> en <b>${hData.cities[params.value[1]]}</b><br/>Éxito: ${val}`;
-                                                    }
-                                                },
-                                                grid: { height: '65%', top: '10%', bottom: '15%', left: '15%', right: '5%', containLabel: true },
-                                                xAxis: {
-                                                    type: 'category',
-                                                    data: hData.carriers,
-                                                    splitArea: { show: true },
-                                                    axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10, rotate: 30 }
-                                                },
-                                                yAxis: {
-                                                    type: 'category',
-                                                    data: hData.cities,
-                                                    splitArea: { show: true },
-                                                    axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10 }
-                                                },
-                                                visualMap: {
-                                                    min: 0,
-                                                    max: 100,
-                                                    calculable: true,
-                                                    orient: 'horizontal',
-                                                    left: 'center',
-                                                    bottom: '2%',
-                                                    inRange: { color: ['#ff0055', '#ffcc00', '#00ff88'] },
-                                                    textStyle: { color: 'rgba(255,255,255,0.5)', fontSize: 10 }
-                                                },
-                                                series: [{
-                                                    name: 'Ruta',
-                                                    type: 'heatmap',
-                                                    data: hData.matrix,
-                                                    label: {
-                                                        show: true,
-                                                        formatter: function(p) { return p.value[2] !== null ? p.value[2] + '%' : '-'; },
-                                                        fontSize: 9,
-                                                        color: '#fff'
+                                            const getEChartsTheme = () => document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : null;
+                                            let myChart = null;
+
+                                            function initHeatmap() {
+                                                const chartDom = document.getElementById('heatmapChart');
+                                                if (!chartDom) return;
+                                                
+                                                if (myChart) myChart.dispose();
+                                                
+                                                const currentTheme = getEChartsTheme();
+                                                myChart = echarts.init(chartDom, currentTheme);
+                                                const hData = <?= json_encode($detailedStats['advanced']['heatmap']) ?>;
+                                                
+                                                const isDark = currentTheme === 'dark';
+                                                const labelColor = isDark ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)') : 'rgba(0,0,0,0.6)';
+
+                                                const option = {
+                                                    backgroundColor: 'transparent',
+                                                    tooltip: {
+                                                        position: 'top',
+                                                        backgroundColor: isDark ? 'rgba(20, 20, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                                                        textStyle: { color: isDark ? '#fff' : '#1e293b' },
+                                                        formatter: function (params) {
+                                                            const val = params.value[2] !== null ? params.value[2] + '%' : 'N/A';
+                                                            return `<b>${hData.carriers[params.value[0]]}</b> en <b>${hData.cities[params.value[1]]}</b><br/>Éxito: ${val}`;
+                                                        }
                                                     },
-                                                    emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
-                                                }]
-                                            };
-                                            myChart.setOption(option);
-                                            window.addEventListener('resize', () => myChart.resize());
+                                                    grid: { height: '65%', top: '10%', bottom: '15%', left: '15%', right: '5%', containLabel: true },
+                                                    xAxis: {
+                                                        type: 'category',
+                                                        data: hData.carriers,
+                                                        splitArea: { show: true },
+                                                        axisLabel: { color: labelColor, fontSize: 10, rotate: 30 }
+                                                    },
+                                                    yAxis: {
+                                                        type: 'category',
+                                                        data: hData.cities,
+                                                        splitArea: { show: true },
+                                                        axisLabel: { color: labelColor, fontSize: 10 }
+                                                    },
+                                                    visualMap: {
+                                                        min: 0,
+                                                        max: 100,
+                                                        calculable: true,
+                                                        orient: 'horizontal',
+                                                        left: 'center',
+                                                        bottom: '2%',
+                                                        inRange: { color: ['#ef4444', '#f59e0b', '#10b981'] },
+                                                        textStyle: { color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)', fontSize: 10 }
+                                                    },
+                                                    series: [{
+                                                        name: 'Ruta',
+                                                        type: 'heatmap',
+                                                        data: hData.matrix,
+                                                        label: {
+                                                            show: true,
+                                                            formatter: function(p) { return p.value[2] !== null ? p.value[2] + '%' : '-'; },
+                                                            fontSize: 9,
+                                                            color: (document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#1e293b')
+                                                        },
+                                                        emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
+                                                    }]
+                                                };
+                                                myChart.setOption(option);
+                                            }
+
+                                            // Observador para cambios de tema
+                                            const themeObserver = new MutationObserver((mutations) => {
+                                                mutations.forEach((mutation) => {
+                                                    if (mutation.attributeName === 'data-theme') {
+                                                        initHeatmap();
+                                                    }
+                                                });
+                                            });
+                                            themeObserver.observe(document.documentElement, { attributes: true });
+
+                                            window.addEventListener('resize', () => {
+                                                if (myChart) myChart.resize();
+                                            });
+
+                                            initHeatmap();
                                         });
                                     </script>
                                 <?php endif; ?>
@@ -842,7 +1058,7 @@ declare(strict_types=1);
                                 document.addEventListener('DOMContentLoaded', () => {
                                     const chartDom = document.getElementById('colombiaMap');
                                     if (!chartDom) return;
-                                    const myChart = echarts.init(chartDom, 'dark');
+                                    const myChart = echarts.init(chartDom, document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : null);
                                     const geoData = <?= json_encode($detailedStats['advanced']['geoPoints'] ?? []) ?>;
                                     
                                     // Asegurar que geoData sea siempre un array válido para evitar errores de JS
@@ -879,7 +1095,7 @@ declare(strict_types=1);
                                                     inRange: {
                                                         color: ['#1a1a2e', '#00d2ff', '#00ff88']
                                                     },
-                                                    textStyle: { color: 'rgba(255,255,255,0.6)' }
+                                                    textStyle: { color: (document.documentElement.getAttribute('data-theme') === 'dark' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)') : 'rgba(0,0,0,0.6)') }
                                                 },
                                                 series: [
                                                     {
@@ -889,12 +1105,12 @@ declare(strict_types=1);
                                                         roam: true,
                                                         nameProperty: 'NOMBRE_DPT',
                                                         emphasis: {
-                                                            label: { show: true, color: '#fff' },
+                                                            label: { show: true, color: (document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#1e293b') },
                                                             itemStyle: { areaColor: 'rgba(0, 255, 255, 0.4)' }
                                                         },
                                                         itemStyle: {
                                                             areaColor: 'rgba(255, 255, 255, 0.05)',
-                                                            borderColor: 'rgba(255, 255, 255, 0.1)'
+                                                            borderColor: (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)')
                                                         },
                                                         data: processedData
                                                     }
@@ -1099,7 +1315,7 @@ declare(strict_types=1);
                                         document.addEventListener('DOMContentLoaded', () => {
                                             const chartDom = document.getElementById('paretoChart');
                                             if (!chartDom) return;
-                                            const myChart = echarts.init(chartDom, 'dark');
+                                            const myChart = echarts.init(chartDom, document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : null);
                                             
                                             // New detailed format from service
                                             const paretoObj = <?= json_encode($detailedStats['advanced']['pareto']) ?>;
@@ -1141,7 +1357,7 @@ declare(strict_types=1);
                                                     type: 'category',
                                                     data: names,
                                                     axisLabel: { 
-                                                        color: 'rgba(255,255,255,0.6)', 
+                                                        color: (document.documentElement.getAttribute('data-theme') === 'dark' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)') : 'rgba(0,0,0,0.6)'), 
                                                         fontSize: 10, 
                                                         rotate: 35,
                                                         interval: 0,
@@ -1155,10 +1371,10 @@ declare(strict_types=1);
                                                         type: 'value',
                                                         name: 'Profit (COP)',
                                                         max: totalProfit > 0 ? totalProfit : 'auto',
-                                                        splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
+                                                        splitLine: { lineStyle: { color: (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)') } },
                                                         axisLabel: { 
                                                             formatter: (v) => '$ ' + (v >= 1000000 ? (v/1000000).toFixed(1) + 'M' : v.toLocaleString('es-CO')),
-                                                            color: 'rgba(255,255,255,0.6)' 
+                                                            color: (document.documentElement.getAttribute('data-theme') === 'dark' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)') : 'rgba(0,0,0,0.6)') 
                                                         }
                                                     },
                                                     {
@@ -1166,7 +1382,7 @@ declare(strict_types=1);
                                                         name: '% Cum.',
                                                         min: 0, max: 100,
                                                         splitLine: { show: false },
-                                                        axisLabel: { formatter: '{value} %', color: 'rgba(255,255,255,0.6)' }
+                                                        axisLabel: { formatter: '{value} %', color: (document.documentElement.getAttribute('data-theme') === 'dark' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)') : 'rgba(0,0,0,0.6)') }
                                                     }
                                                 ],
                                                 series: [
@@ -1183,7 +1399,7 @@ declare(strict_types=1);
                                                         label: {
                                                             show: true,
                                                             position: 'top',
-                                                            color: '#fff',
+                                                            color: (document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#1e293b'),
                                                             fontSize: 9,
                                                             formatter: (p) => {
                                                                 const pct = totalProfit > 0 ? ((p.value / totalProfit) * 100).toFixed(0) : 0;
@@ -1447,7 +1663,7 @@ declare(strict_types=1);
                                                     (function() {
                                                         const chartDom = document.getElementById('waterfallChart-<?= $idx ?>');
                                                         if (!chartDom) return;
-                                                        const myChart = echarts.init(chartDom, 'dark');
+                                                        const myChart = echarts.init(chartDom, document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : null);
                                                         
                                                         const rawData = [
                                                             { name: 'Ventas Brutas', value: <?= (float)$m['ingresos_brutos'] ?>, type: 'plus' },
@@ -1499,20 +1715,20 @@ declare(strict_types=1);
                                                                     const pct = ((Math.abs(tar.value) / baseVal) * 100).toFixed(1);
                                                                     return `<b>${tar.name}</b><br/>Valor: $${Number(tar.value).toLocaleString('es-CO')}<br/>Impacto: ${pct}% de las ventas`;
                                                                 },
-                                                                backgroundColor: 'rgba(20, 20, 30, 0.9)',
-                                                                borderColor: 'rgba(255, 255, 255, 0.1)',
-                                                                textStyle: { color: '#fff' }
+                                                                backgroundColor: (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(20, 20, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)'),
+                                                                borderColor: (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'),
+                                                                textStyle: { color: (document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#1e293b') }
                                                             },
                                                             grid: { left: '3%', right: '4%', bottom: '25%', top: '20%', containLabel: true },
                                                             xAxis: {
                                                                 type: 'category',
                                                                 data: rawData.map(d => d.name),
-                                                                axisLabel: { color: 'rgba(255, 255, 255, 0.6)', fontSize: 10, rotate: 45 }
+                                                                axisLabel: { color: (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)'), fontSize: 10, rotate: 45 }
                                                             },
                                                             yAxis: {
                                                                 type: 'value',
-                                                                splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
-                                                                axisLabel: { color: 'rgba(255, 255, 255, 0.6)' }
+                                                                splitLine: { lineStyle: { color: (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)') } },
+                                                                axisLabel: { color: (document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)') }
                                                             },
                                                             series: [
                                                                 {
@@ -1536,7 +1752,7 @@ declare(strict_types=1);
                                                                             const pct = ((p.value / base) * 100).toFixed(1);
                                                                             return `$${(p.value/1000).toFixed(0)}k\n(${pct}%)`;
                                                                         }, 
-                                                                        color: '#fff', 
+                                                                        color: (document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#1e293b'), 
                                                                         fontSize: 10 
                                                                     },
                                                                     itemStyle: { color: '#00d2ff', borderRadius: [4, 4, 0, 0] },
@@ -1575,7 +1791,7 @@ declare(strict_types=1);
                                                                             const pct = ((Math.abs(val) / base) * 100).toFixed(1);
                                                                             return (val < 0 ? '-' : '') + '$' + (Math.abs(val)/1000).toFixed(0) + 'k\n(' + pct + '%)';
                                                                         }, 
-                                                                        color: '#fff', 
+                                                                        color: (document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#1e293b'), 
                                                                         fontWeight: 'bold' 
                                                                     },
                                                                     itemStyle: { 
@@ -1759,7 +1975,192 @@ declare(strict_types=1);
                         <?php endif; ?>
                     <?php endif; ?> <!-- Closes detailedStats (263) -->
                 <?php endif; ?> <!-- Closes else (225) -->
-                <!-- Spacer to prevent footer overlap -->
+                    <?php if ($activeTab === 'tutorial'): ?>
+                        <!-- Guía y Tutorial Section -->
+                        <div class="animate__animated animate__fadeIn">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle" style="border: 1px solid rgba(var(--track-primary-rgb), 0.3);">
+                                    <i class="bi bi-journal-richtext fs-3 text-primary"></i>
+                                </div>
+                                <div>
+                                    <h2 class="h3 fw-bold mb-1" style="color: var(--track-text);">Guía y Tutorial</h2>
+                                    <p class="text-muted mb-0">Entiende tus datos y aprende a leer las gráficas de TrackApp.</p>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <!-- 1. Consolidado Global -->
+                                <div class="col-12">
+                                    <div class="stats-card-premium p-4 h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h4 class="fw-bold d-flex align-items-center gap-2" style="color: var(--track-primary);">
+                                                <i class="bi bi-globe2"></i> Consolidado Global
+                                            </h4>
+                                            <a href="/estadisticas?tab=consolidado" class="btn btn-sm btn-outline-primary rounded-pill px-3">Ir a la vista</a>
+                                        </div>
+                                        <p style="color: var(--track-text); opacity: 0.8;">Es el resumen estratégico de tu negocio. Aquí ves la salud financiera general.</p>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="p-3 rounded border border-secondary border-opacity-10 shadow-sm" style="background: var(--track-hover-bg);">
+                                                    <span class="fw-bold d-block mb-1 text-primary">Profit Neto</span>
+                                                    <small class="d-block text-muted mb-2">¿Cómo se lee? Es tu ganancia real de bolsillo después de restar todos los gastos.</small>
+                                                    <div class="p-2 rounded font-monospace" style="font-size: 0.75rem; color: var(--track-primary); background: rgba(var(--track-primary-rgb, 0, 255, 255), 0.05); border: 1px solid rgba(var(--track-primary-rgb, 0, 255, 255), 0.1);">
+                                                        Cálculo: Ingreso Bruto - Costos Producto - Costos Envío - Gasto Pauta
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="p-3 rounded border border-secondary border-opacity-10 shadow-sm" style="background: var(--track-hover-bg);">
+                                                    <span class="fw-bold d-block mb-1 text-warning">ROAS (Return on Ad Spend)</span>
+                                                    <small class="d-block text-muted mb-2">¿Cómo se lee? Cuántas veces recuperas lo invertido en publicidad.</small>
+                                                    <div class="p-2 rounded font-monospace" style="font-size: 0.75rem; color: #f59e0b; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.1);">
+                                                        Cálculo: Ingreso Total / Inversión en Publicidad
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Logística y Courier -->
+                                <div class="col-md-6">
+                                    <div class="stats-card-premium p-4 h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h4 class="fw-bold d-flex align-items-center gap-2 mb-0" style="color: #20c997;">
+                                                <i class="bi bi-truck"></i> Logística y Courier
+                                            </h4>
+                                            <a href="/estadisticas?tab=logistica" class="btn btn-sm btn-outline-primary rounded-pill px-3">Ir a la vista</a>
+                                        </div>
+                                        <p class="small text-muted mb-4" style="color: var(--track-muted);">Audita el rendimiento de tus transportadoras y la efectividad de entrega.</p>
+                                        
+                                        <div class="mb-4">
+                                            <span class="fw-bold d-block mb-1" style="color: #20c997;">Matriz de Fiabilidad (Heatmap)</span>
+                                            <small class="text-muted d-block mb-2" style="color: var(--track-muted);">Muestra qué transportadoras tienen mayor tasa de éxito. Los colores más intensos indican mayor volumen de pedidos en ese estado.</small>
+                                        </div>
+
+                                        <div class="p-3 rounded border border-info border-opacity-10" style="background: rgba(var(--track-primary-rgb), 0.03);">
+                                            <span class="small fw-bold d-block mb-1 text-info">Ítem: % Efectividad</span>
+                                            <small class="text-muted" style="color: var(--track-muted);">Se calcula dividiendo los pedidos <b>Entregados</b> sobre el total de pedidos <b>Despachados</b>. Es tu indicador de calidad logística.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Análisis Geográfico -->
+                                <div class="col-md-6">
+                                    <div class="stats-card-premium p-4 h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h4 class="fw-bold d-flex align-items-center gap-2 mb-0" style="color: #6366f1;">
+                                                <i class="bi bi-geo-fill"></i> Análisis Geográfico
+                                            </h4>
+                                            <a href="/estadisticas?tab=geografia" class="btn btn-sm btn-outline-primary rounded-pill px-3">Ir a la vista</a>
+                                        </div>
+                                        <p class="small text-muted mb-4" style="color: var(--track-muted);">Identifica dónde se concentra tu demanda en toda Colombia.</p>
+                                        
+                                        <div class="mb-3">
+                                            <span class="fw-bold d-block mb-1" style="color: #6366f1;">Mapa Departamental</span>
+                                            <small class="text-muted d-block mb-2" style="color: var(--track-muted);">Las zonas más oscuras o con colores vibrantes son donde más pedidos estás vendiendo. Úsalo para segmentar tu pauta publicitaria en esas regiones.</small>
+                                        </div>
+
+                                        <div class="p-3 rounded border border-secondary border-opacity-10" style="background: var(--track-hover-bg);">
+                                            <small class="text-muted italic" style="color: var(--track-text);"><i class="bi bi-lightbulb text-warning me-1"></i> Tip: Si un departamento tiene alto volumen pero baja efectividad, podrías tener problemas de cobertura con tu transportadora actual allí.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Rendimiento SKUs -->
+                                <div class="col-12">
+                                    <div class="stats-card-premium p-4">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h4 class="fw-bold d-flex align-items-center gap-2 mb-0" style="color: #ff9f43;">
+                                                <i class="bi bi-box-seam"></i> Rendimiento SKUs (Análisis de Pareto)
+                                            </h4>
+                                            <a href="/estadisticas?tab=productos" class="btn btn-sm btn-outline-primary rounded-pill px-3">Ir a la vista</a>
+                                        </div>
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-8">
+                                                <p style="color: var(--track-text); opacity: 0.8;">Este análisis separa tus productos en categorías según su impacto en el beneficio real.</p>
+                                                <ul class="list-unstyled mb-0">
+                                                    <li class="mb-3">
+                                                        <span class="badge bg-success bg-opacity-25 text-success mb-1">Regla 80/20</span>
+                                                        <small class="d-block text-muted" style="color: var(--track-muted);">El gráfico muestra cómo un pequeño grupo de productos (20%) suele generar la gran mayoría de tus ganancias (80%).</small>
+                                                    </li>
+                                                    <li class="mb-3">
+                                                        <span class="badge bg-info bg-opacity-25 text-info mb-1">Productos Estrella</span>
+                                                        <small class="d-block text-muted" style="color: var(--track-muted);">Aparecen a la izquierda. Tienen alto volumen y alto profit neto. Son los que deben escalar.</small>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="p-3 rounded border border-warning border-opacity-30 ripple-glow" style="background: rgba(245, 158, 11, 0.05);">
+                                                    <span class="fw-bold d-block mb-1 text-warning">¿Cómo leer el Pareto?</span>
+                                                    <p class="small mb-0" style="color: var(--track-text);">Las barras son el profit por producto. La línea curva muestra la acumulación porcentual. Cuando la línea cruza el 80%, todo lo que está a la izquierda es tu núcleo vital de negocio.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 5. Finanzas y Pauta -->
+                                <div class="col-12">
+                                    <div class="stats-card-premium p-4">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h4 class="fw-bold d-flex align-items-center gap-2 mb-0" style="color: var(--track-primary);">
+                                                <i class="bi bi-cash-stack"></i> Finanzas y Pauta (Análisis de Cascada)
+                                            </h4>
+                                            <a href="/estadisticas?tab=finanzas" class="btn btn-sm btn-outline-primary rounded-pill px-3">Ir a la vista</a>
+                                        </div>
+                                        <div class="mb-4">
+                                            <p style="color: var(--track-text); opacity: 0.8;">Es el desglose más detallado del dinero. La gráfica de cascada te ayuda a ver dónde se "evapora" el margen.</p>
+                                        </div>
+                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-borderless mb-0" style="font-size: 0.85rem; color: var(--track-text);">
+                                                <thead>
+                                                    <tr class="border-bottom border-secondary border-opacity-10">
+                                                        <th class="pb-2 text-muted" style="color: var(--track-muted) !important;">Ítem del Sistema</th>
+                                                        <th class="pb-2 text-muted" style="color: var(--track-muted) !important;">Qué incluye / Cómo se saca</th>
+                                                        <th class="pb-2 text-muted" style="color: var(--track-muted) !important;">Impacto en Profit</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold pt-3 text-info">Ingreso Bruto</td>
+                                                        <td class="pt-3">Suma de todos los pedidos en estado "Entregado".</td>
+                                                        <td class="pt-3 text-success">+ 100% (Punto de partida)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold text-danger">Costos Producto</td>
+                                                        <td>Precio de compra del SKU (COGS) × Cantidad vendida.</td>
+                                                        <td class="text-danger">- Resta del margen</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold text-danger">Costos Envío</td>
+                                                        <td>Flete cobrado por la transportadora por las entregas exitosas.</td>
+                                                        <td class="text-danger">- Resta del margen</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold text-warning">Gasto Pauta</td>
+                                                        <td>Valor que ingresas manualmente cada mes por inversión publicitaria.</td>
+                                                        <td class="text-danger">- Resta del margen</td>
+                                                    </tr>
+                                                    <tr class="border-top border-secondary border-opacity-20">
+                                                        <td class="fw-bold pt-2" style="color: var(--track-primary);">Profit Neto</td>
+                                                        <td class="pt-2">Lo que te queda libre después de pagar todo lo anterior.</td>
+                                                        <td class="pt-2 fw-bold text-success">= Resultado Final</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 text-center p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-20">
+                                <h5 class="fw-bold text-primary mb-2">¿Necesitas más ayuda?</h5>
+                                <p class="text-muted small mb-0" style="color: var(--track-muted);">Cada sección de las estadísticas está diseñada para que tomes decisiones basadas en datos reales, no en suposiciones. Empieza explorando el <b>Consolidado Global</b> para una vista rápida.</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 <div class="py-5 my-5 d-none d-lg-block"></div>
                 <div class="py-3 d-lg-none"></div>
 
@@ -1802,6 +2203,12 @@ declare(strict_types=1);
                     <a class="nav-link" href="/estadisticas?tab=finanzas"
                         :class="{ 'active': activeTab === 'finanzas' }">
                         <i class="bi bi-cash-stack"></i> Finanzas y Pauta
+                    </a>
+
+                    <div class="nav-stats-category">Soporte</div>
+                    <a class="nav-link" href="/estadisticas?tab=tutorial"
+                        :class="{ 'active': activeTab === 'tutorial' }">
+                        <i class="bi bi-journal-richtext"></i> Guía y Tutorial
                     </a>
                 </div>
             </div>
