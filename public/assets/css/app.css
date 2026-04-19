@@ -419,6 +419,28 @@ p, span, label, td, th {
     background: var(--track-surface);
     backdrop-filter: var(--track-blur);
     -webkit-backdrop-filter: var(--track-blur);
+    transition: all 0.3s ease;
+}
+
+[data-theme="light"] .track-footer {
+    background: rgba(255, 255, 255, 0.95);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.footer-link {
+    color: var(--track-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.footer-link:hover {
+    color: var(--track-primary);
+    background: var(--track-hover-bg);
+    text-shadow: 0 0 10px var(--track-accent-glow);
 }
 
 /* Skeleton Glow */
