@@ -49,4 +49,16 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+ 
+ CREATE TABLE IF NOT EXISTS ad_spends (
+     id INTEGER PRIMARY KEY AUTOINCREMENT,
+     mes VARCHAR(7) NOT NULL,
+     tienda_id VARCHAR(50) NOT NULL DEFAULT 'global',
+     amount REAL NOT NULL DEFAULT 0,
+     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     UNIQUE(mes, tienda_id)
+ );
+ 
+ CREATE INDEX IF NOT EXISTS idx_ad_spends_mes_tienda ON ad_spends (mes, tienda_id);
 

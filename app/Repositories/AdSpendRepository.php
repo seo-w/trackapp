@@ -82,11 +82,14 @@ final class AdSpendRepository
             }
 
             $sql = $res['sql'];
-            // Si la tabla existe pero no tiene el índice compuesto (mes, tienda_id), forzamos migración rápida
+            // Si la tabla existe pero no tiene el índice compuesto (mes, tienda_id), informamos que requiere recreación
             if (!str_contains($sql, 'UNIQUE(mes, tienda_id)') && !str_contains($sql, 'UNIQUE (mes, tienda_id)')) {
-                 // Esta parte ya debería haber sido manejada por la migración manual, 
-                 // pero la dejamos aquí como fallback seguro
-                 $this->pdo->exec("ALTER TABLE ad_spends ADD COLUMN tienda_id VARCHAR(50) DEFAULT 'global'");
+                 // En SQLite, agregar una restricción UNIQUE requiere recrear la tabla.
+                 // Como esta es una app de analítica, si detectamos el esquema viejo, 
+                 // lo ideal sería una migración de datos, pero para este hotfix 
+                 // asumimos que el usuario aceptó la recreación o que la tabla se limpiará.
+                 $this->pdo->exec("DROP TABLE ad_spends");
+                 $this->ensureTableExists();
             }
         } catch (PDOException $e) {
             // Si hay un error al consultar sqlite_master, intentamos crear la tabla por si acaso

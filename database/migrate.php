@@ -14,6 +14,7 @@ declare(strict_types=1);
  */
 
 $basePath = dirname(__DIR__);
+define('BASE_PATH', $basePath);
 
 if (! is_file($basePath . '/config/database.php')) {
     fwrite(STDERR, "No se encontró config/database.php.\n");
