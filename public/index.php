@@ -32,6 +32,7 @@ $router->post('/reset-password', AuthController::class, 'resetPassword');
 $router->get('/', HomeController::class, 'index');
 $router->get('/consultas', ConsultasController::class, 'index');
 $router->post('/consultas', ConsultasController::class, 'consultar');
+$router->get('/consultas/novedades', ConsultasController::class, 'novedades');
 $router->get('/configuracion', SettingsController::class, 'index');
 $router->post('/configuracion', SettingsController::class, 'save');
 $router->post('/configuracion/sync', SettingsController::class, 'syncMerkaweb');

@@ -150,13 +150,31 @@ final class MerkawebService
      */
     public function findProductoById($productId)
     {
-
         $credentials = $this->resolveCredentials();
         if ($credentials instanceof MerkawebResult) {
             return $credentials;
         }
 
         $url = $credentials['api_base_url'] . '/productos/' . $productId;
+        $response = $this->http->get($url, [
+            'Authorization' => 'Bearer ' . $credentials['token'],
+            'Accept' => 'application/json',
+        ]);
+
+        return $this->interpretHttpResponse($response);
+    }
+
+    /**
+     * GET /novedades/findByPedido/{pedidoId} con Authorization: Bearer …
+     */
+    public function findNovedadesByPedidoId($pedidoId)
+    {
+        $credentials = $this->resolveCredentials();
+        if ($credentials instanceof MerkawebResult) {
+            return $credentials;
+        }
+
+        $url = $credentials['api_base_url'] . '/novedades/findByPedido/' . $pedidoId;
         $response = $this->http->get($url, [
             'Authorization' => 'Bearer ' . $credentials['token'],
             'Accept' => 'application/json',

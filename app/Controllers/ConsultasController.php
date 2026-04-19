@@ -218,4 +218,53 @@ final class ConsultasController extends Controller
 
         return $base;
     }
+    /**
+     * AJAX: Obtiene las novedades de un pedido.
+     */
+    public function novedades(): void
+    {
+        $this->requireAuth();
+        
+        $pedidoId = (string) ($_GET['id'] ?? '');
+        if ($pedidoId === '') {
+            $this->jsonResponse(['error' => 'ID de pedido faltante.'], 400);
+            return;
+        }
+
+        try {
+            $pdo = db()->pdo();
+            $repo = new AppSettingsRepository($pdo);
+            $merkaweb = MerkawebService::fromApp(config('app'), $repo);
+            
+            $result = $merkaweb->findNovedadesByPedidoId($pedidoId);
+            
+            if (!$result->ok) {
+                // Si es un error de Merkaweb (ej:Pedido no encontrado), devolvemos 200 con el error para manejarlo en la UI
+                $this->jsonResponse([
+                    'ok' => false,
+                    'error' => $result->message,
+                ]);
+                return;
+            }
+
+            $this->jsonResponse([
+                'ok' => true,
+                'data' => $result->data
+            ]);
+
+        } catch (\Throwable $e) {
+            $this->jsonResponse(['error' => 'Error interno: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Helper para responder en JSON.
+     */
+    private function jsonResponse(array $data, int $status = 200): void
+    {
+        header('Content-Type: application/json');
+        http_response_code($status);
+        echo json_encode($data);
+        exit;
+    }
 }

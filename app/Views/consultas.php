@@ -207,6 +207,19 @@ $noFormErr = $formError === null || $formError === '';
         border-color: var(--track-primary) !important;
         box-shadow: 0 0 15px var(--track-accent-glow);
     }
+
+    /* Timeline Estilo Premium */
+    .timeline-container { position: relative; padding-left: 30px; }
+    .timeline-container::before { content: ''; position: absolute; left: 7px; top: 5px; bottom: 5px; width: 2px; background: var(--track-border); }
+    .timeline-item { position: relative; margin-bottom: 1.5rem; }
+    .timeline-dot { position: absolute; left: -30px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--track-surface-high); border: 2px solid var(--track-primary); box-shadow: 0 0 10px var(--track-accent-glow); z-index: 2; }
+    .timeline-item.active .timeline-dot { background: var(--track-primary); box-shadow: 0 0 15px var(--track-primary); }
+    .timeline-content { background: var(--track-surface); border: 1px solid var(--track-border); padding: 1rem; border-radius: 12px; backdrop-filter: var(--track-blur); }
+    .timeline-date { font-size: 0.7rem; color: var(--track-muted); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 700; }
+    .timeline-text { font-size: 0.85rem; color: var(--track-text); line-height: 1.4; }
+
+    [data-theme="light"] .timeline-dot { border-color: var(--track-primary); }
+    [data-theme="light"] .timeline-content { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 </style>
 
 <div class="container track-page-header pt-5 mt-4 mb-4">
@@ -370,10 +383,92 @@ $noFormErr = $formError === null || $formError === '';
             pageSize: 15,
             sortKey: 'date',
             sortDir: 'desc',
+            // Novedades Logic
+            novedadesData: [],
+            loadingNovedades: false,
+            currentPedidoId: null,
+            novedadesError: null,
+            availability: {}, // map of orderId => boolean
+            isScanning: false,
+            scanProgress: 0,
+            novedadesFilter: false,
+
+            async fetchNovedades(id) {
+                this.currentPedidoId = id;
+                this.loadingNovedades = true;
+                this.novedadesData = [];
+                this.novedadesError = null;
+
+                try {
+                    // Si ya tenemos los datos de la disponibilidad, los usamos si es posible
+                    // Pero para asegurar que tenemos los datos frescos, consultamos.
+                    const response = await fetch(`/consultas/novedades?id=${id}`);
+                    const result = await response.json();
+                    if (result.ok) {
+                        this.novedadesData = result.data;
+                    } else {
+                        this.novedadesError = result.error || 'No se pudieron cargar las novedades.';
+                    }
+                } catch (e) {
+                    this.novedadesError = 'Error de conexión.';
+                } finally {
+                    this.loadingNovedades = false;
+                }
+            },
+
+            async checkAvailability(id) {
+                if (this.availability[id] !== undefined) return;
+                
+                try {
+                    const response = await fetch(`/consultas/novedades?id=${id}`);
+                    const result = await response.json();
+                    this.availability[id] = result.ok && result.data && result.data.length > 0;
+                } catch (e) {
+                    this.availability[id] = false;
+                }
+            },
+
+            async scanAllNovedades() {
+                if (this.isScanning) return;
+                this.isScanning = true;
+                this.scanProgress = 0;
+                
+                const targetList = this.filtered;
+                const total = targetList.length;
+                
+                if (total === 0) {
+                    this.isScanning = false;
+                    return;
+                }
+
+                for (let i = 0; i < total; i++) {
+                    const order = targetList[i];
+                    // Retraso consciente de 300ms entre consultas (excepto la primera)
+                    if (i > 0) await new Promise(r => setTimeout(r, 300));
+                    
+                    await this.checkAvailability(order.id);
+                    this.scanProgress = Math.round(((i + 1) / total) * 100);
+                }
+
+                this.isScanning = false;
+                // Activar filtro automáticamente si hay resultados
+                const hasNovedades = Object.values(this.availability).some(v => v === true);
+                if (hasNovedades) this.novedadesFilter = true;
+            },
+
+            init() {
+                // Ya no iniciamos escaneo automático para respetar el servidor
+            },
             get filtered() {
-                if (!this.q.trim()) return this.all;
-                const query = this.q.toLowerCase();
-                return this.all.filter(o => o.search.includes(query));
+                let list = this.all;
+                if (this.q.trim()) {
+                    const query = this.q.toLowerCase();
+                    list = list.filter(o => o.search.includes(query));
+                }
+                if (this.novedadesFilter) {
+                    list = list.filter(o => this.availability[o.id] === true);
+                }
+                return list;
             },
             get sorted() {
                 return [...this.filtered].sort((a, b) => {
@@ -411,14 +506,33 @@ $noFormErr = $formError === null || $formError === '';
                                 <input type="search" class="form-control border-0 bg-transparent p-0" style="color: var(--track-text);" id="consultaBuscar" x-model="q" @input="page = 1" placeholder="Filtrar por Nombre, Ciudad, ID..." autocomplete="off">
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                             <span class="small fw-bold" style="color: var(--track-text); letter-spacing: 0.1em;">FILAS POR PÁGINA:</span>
-                             <select class="form-select form-select-sm w-auto border-secondary" x-model="pageSize" @change="page = 1" style="background: var(--track-surface-high); color: var(--track-text); border-radius: 8px;">
-                                  <option value="15">15</option>
-                                  <option value="30">30</option>
-                                  <option value="50">50</option>
-                                  <option value="100">100</option>
-                             </select>
+                        <div class="d-flex align-items-center flex-wrap gap-3">
+                             <!-- Scanner Button -->
+                             <button type="button" 
+                                     class="btn btn-sm d-flex align-items-center gap-2 px-3 fw-bold" 
+                                     style="border-radius: 8px; transition: all 0.3s ease; background: var(--track-surface-high); border: 1px solid var(--track-border); color: var(--track-primary);"
+                                     :style="isScanning ? 'box-shadow: 0 0 15px var(--track-accent-glow);' : ''"
+                                     @click="scanAllNovedades()"
+                                     :disabled="isScanning">
+                                 <i class="bi" :class="isScanning ? 'spinner-border spinner-border-sm' : 'bi-radar'"></i>
+                                 <span x-text="isScanning ? 'Escaneando ' + scanProgress + '%' : 'Buscar Novedades'"></span>
+                             </button>
+
+                             <!-- Filter Toggle -->
+                             <div class="form-check form-switch ms-md-2" x-show="Object.keys(availability).length > 0">
+                                 <input class="form-check-input" type="checkbox" role="switch" id="filterNovedades" x-model="novedadesFilter" style="cursor: pointer;">
+                                 <label class="form-check-label small fw-bold" for="filterNovedades" style="color: var(--track-text); cursor: pointer;">Solo con Novedades</label>
+                             </div>
+
+                             <div class="d-flex align-items-center gap-3 ms-md-auto">
+                                 <span class="small fw-bold" style="color: var(--track-text); letter-spacing: 0.1em;">FILAS POR PÁGINA:</span>
+                                 <select class="form-select form-select-sm w-auto border-secondary" x-model="pageSize" @change="page = 1" style="background: var(--track-surface-high); color: var(--track-text); border-radius: 8px;">
+                                      <option value="15">15</option>
+                                      <option value="30">30</option>
+                                      <option value="50">50</option>
+                                      <option value="100">100</option>
+                                 </select>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -481,7 +595,21 @@ $noFormErr = $formError === null || $formError === '';
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
+                                            <div class="d-flex flex-column align-items-center gap-2">
+                                                <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-link p-0 text-decoration-none d-flex align-items-center gap-1" 
+                                                        x-show="availability[o.id]"
+                                                        x-transition:enter="transition ease-out duration-300"
+                                                        x-transition:enter-start="opacity-0 scale-90"
+                                                        x-transition:enter-end="opacity-100 scale-100"
+                                                        @click="fetchNovedades(o.id)" 
+                                                        data-bs-toggle="offcanvas" 
+                                                        data-bs-target="#offcanvasNovedades">
+                                                    <i class="bi bi-clock-history" style="color: var(--track-primary); filter: drop-shadow(0 0 3px var(--track-accent-glow));"></i>
+                                                    <span style="font-size: 0.65rem; color: var(--track-primary); font-weight: 700; letter-spacing: 0.05em;">NOVEDADES</span>
+                                                </button>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="fw-bold lh-1 mb-1" style="color: var(--track-text);" x-text="o.date"></div>
@@ -515,7 +643,17 @@ $noFormErr = $formError === null || $formError === '';
                                         <div class="fw-bold lh-sm mt-1" style="color: var(--track-text);" x-text="o.name"></div>
                                     </div>
                                 </div>
-                                <span class="badge rounded-pill px-2 py-1" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-link p-0 text-decoration-none" 
+                                            x-show="availability[o.id]"
+                                            @click="fetchNovedades(o.id)" 
+                                            data-bs-toggle="offcanvas" 
+                                            data-bs-target="#offcanvasNovedades">
+                                        <i class="bi bi-clock-history fs-5" style="color: var(--track-primary); filter: drop-shadow(0 0 3px var(--track-accent-glow));"></i>
+                                    </button>
+                                    <span class="badge rounded-pill px-2 py-1" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
+                                </div>
                             </div>
                             <div class="row g-3 small mb-3">
                                 <div class="col-6">
@@ -577,6 +715,61 @@ $noFormErr = $formError === null || $formError === '';
                 <p class="text-muted small">Prueba con otros términos o limpia el filtro.</p>
                 <button class="btn btn-sm btn-outline-primary rounded-pill mt-2" @click="q = ''">Limpiar búsqueda</button>
             </div>
+        <?php endif; ?>
+
+        <!-- Offcanvas Novedades -->
+        <div class="offcanvas offcanvas-end border-start" tabindex="-1" id="offcanvasNovedades" style="background: var(--track-bg); color: var(--track-text); width: 400px; border-color: var(--track-border) !important;">
+            <div class="offcanvas-header border-bottom" style="border-color: var(--track-border) !important;">
+                <div>
+                    <h5 class="offcanvas-title fw-bold" style="color: var(--track-primary); text-shadow: 0 0 10px var(--track-accent-glow);">Historial de Novedades</h5>
+                    <div class="small text-muted mt-1" x-text="'Pedido #' + currentPedidoId"></div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close" :class="document.documentElement.getAttribute('data-theme') === 'light' ? 'btn-close-dark' : 'btn-close-white'"></button>
+            </div>
+            <div class="offcanvas-body p-4 custom-scrollbar">
+                <!-- Loading -->
+                <div x-show="loadingNovedades" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <div class="mt-3 small text-muted">Consultando historial en Merkaweb...</div>
+                </div>
+
+                <!-- Error -->
+                <div x-show="novedadesError" class="alert alert-danger border-0 shadow-sm" style="border-radius: 12px; background: rgba(225, 29, 72, 0.1); color: #ff4d7e;">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span x-text="novedadesError"></span>
+                </div>
+
+                <!-- Empty -->
+                <div x-show="!loadingNovedades && novedadesData.length === 0 && !novedadesError" class="text-center py-5 opacity-50">
+                    <i class="bi bi-chat-left-dots fs-1 mb-3 d-block"></i>
+                    <p>No se encontraron novedades registradas para este pedido.</p>
+                </div>
+
+                <!-- Timeline -->
+                <div x-show="!loadingNovedades && novedadesData.length > 0" class="timeline-container">
+                    <template x-for="(n, index) in novedadesData" :key="n.id">
+                        <div class="timeline-item" :class="index === 0 ? 'active' : ''">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date d-flex justify-content-between">
+                                    <span x-text="new Date(n.created_at).toLocaleDateString() + ' ' + new Date(n.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></span>
+                                    <span class="badge" :class="n.estado == 0 ? 'bg-info' : 'bg-success'" style="font-size: 0.6rem;" x-text="n.estado == 0 ? 'PENDIENTE' : 'IMPORTANTE'"></span>
+                                </div>
+                                <div class="timeline-text" x-text="n.descripcion"></div>
+                                <template x-if="n.Comments && n.Comments.length > 0">
+                                    <div class="mt-2 pt-2 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
+                                        <template x-for="c in n.Comments" :key="c.id">
+                                            <div class="small opacity-75 italic mb-1" x-text="'— ' + c.comentario"></div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
         </div>
-    <?php endif; ?>
+    </div>
 </div>
