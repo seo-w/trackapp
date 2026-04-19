@@ -250,27 +250,12 @@ $noFormErr = $formError === null || $formError === '';
                 }
             }
          }">
-        <form method="post" action="/consultas" class="row align-items-end g-3">
+        <form method="post" action="/consultas" class="row g-4 align-items-end">
             <?= csrf_field() ?>
             
-            <!-- Rango de Fechas -->
-            <div class="col-12 col-xl-5">
-                <span class="track-label-mini">Periodo de tiempo</span>
-                <div class="d-flex gap-3">
-                    <div class="track-input-group flex-fill">
-                        <i class="bi bi-calendar-event me-2" style="color: #849495;"></i>
-                        <input type="date" class="form-control" name="fecha_desde" value="<?= htmlspecialchars($fechaDesde ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Desde" required>
-                    </div>
-                    <div class="track-input-group flex-fill">
-                        <i class="bi bi-calendar-check me-2" style="color: #849495;"></i>
-                        <input type="date" class="form-control" name="fecha_hasta" value="<?= htmlspecialchars($fechaHasta ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Hasta" required>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chips de Estado -->
-            <div class="col-12 col-xl-5">
-                <span class="track-label-mini">Filtrar por estados</span>
+            <!-- Fila 1: Chips de Estado (Ancho total) -->
+            <div class="col-12 mb-2">
+                <span class="track-label-mini">Filtrar por estados logísticos</span>
                 <div class="d-flex flex-wrap gap-2">
                     <?php 
                     $labels = [2 => 'Despachado', 3 => 'Entregado', 4 => 'Devuelto', 5 => 'Legalizado'];
@@ -286,13 +271,33 @@ $noFormErr = $formError === null || $formError === '';
                 </div>
             </div>
 
-            <!-- Acciones -->
-            <div class="col-12 col-xl-2">
-                <div class="d-flex gap-3 justify-content-xl-end align-items-center h-100 pb-1">
-                    <a href="/consultas" class="text-decoration-none small fw-bold" style="color: #849495; letter-spacing: 0.05em; text-transform: uppercase;">Limpiar</a>
-                    <button type="submit" class="btn btn-search-main w-100 w-xl-auto">
-                        <i class="bi bi-search me-2"></i> Consultar
-                    </button>
+            <!-- Fila 2: Rango de Fechas y Acciones -->
+            <div class="col-12 col-lg-8">
+                <span class="track-label-mini">Periodo de consulta</span>
+                <div class="row g-3">
+                    <div class="col-md-6 text-start">
+                        <div class="track-input-group">
+                            <i class="bi bi-calendar-event me-2" style="color: var(--track-muted);"></i>
+                            <input type="date" class="form-control" name="fecha_desde" value="<?= htmlspecialchars($fechaDesde ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Desde" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-start">
+                        <div class="track-input-group">
+                            <i class="bi bi-calendar-check me-2" style="color: var(--track-muted);"></i>
+                            <input type="date" class="form-control" name="fecha_hasta" value="<?= htmlspecialchars($fechaHasta ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Hasta" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="d-flex gap-3 justify-content-lg-end align-items-center pb-1">
+                    <div class="flex-grow-1">
+                        <button type="submit" class="btn btn-search-main w-100 py-3">
+                            <i class="bi bi-search me-2"></i> Iniciar Consulta
+                        </button>
+                    </div>
+                    <a href="/consultas" class="text-decoration-none small fw-bold px-3 py-2 rounded text-muted hover-bg-light" style="letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">Limpiar</a>
                 </div>
             </div>
         </form>
@@ -426,13 +431,12 @@ $noFormErr = $formError === null || $formError === '';
                         <table class="table align-middle mb-0 table-borderless table-premium">
                             <thead style="border-bottom: 1px solid var(--track-border);">
                                 <tr>
-                                    <th @click="sortBy('id')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em; padding-left: 1.5rem;">Pedido <i class="bi" :class="sortKey === 'id' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
+                                    <th @click="sortBy('id')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em; padding-left: 1.5rem;">Pedido <i class="bi" :class="sortKey === 'id' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-45'"></i></th>
                                     <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Producto</th>
-                                    <th @click="sortBy('customer')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Cliente <i class="bi" :class="sortKey === 'customer' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Guía y Transp.</th>
-                                    <th @click="sortBy('city')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Destino <i class="bi" :class="sortKey === 'city' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th @click="sortBy('statusCode')" class="cursor-pointer text-center text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Estado <i class="bi" :class="sortKey === 'statusCode' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
-                                    <th @click="sortBy('date')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Actualizado <i class="bi" :class="sortKey === 'date' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-25'"></i></th>
+                                    <th @click="sortBy('customer')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Cliente <i class="bi" :class="sortKey === 'customer' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-45'"></i></th>
+                                    <th @click="sortBy('guide')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Logística y Destino <i class="bi" :class="sortKey === 'guide' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-45'"></i></th>
+                                    <th @click="sortBy('statusCode')" class="cursor-pointer text-center text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Estado <i class="bi" :class="sortKey === 'statusCode' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-45'"></i></th>
+                                    <th @click="sortBy('date')" class="cursor-pointer text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Actualizado <i class="bi" :class="sortKey === 'date' ? (sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-arrow-down-up opacity-45'"></i></th>
                                     <th class="text-end px-4 text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Acción</th>
                                 </tr>
                             </thead>
@@ -453,7 +457,7 @@ $noFormErr = $formError === null || $formError === '';
                                                 </template>
                                                 <div style="line-height: 1.3">
                                                     <div class="fw-bold text-truncate" style="max-width: 180px; color: var(--track-text);" x-text="o.name || 'Sin nombre'"></div>
-                                                    <div style="font-size: 0.75rem; color: var(--track-muted);" x-text="o.warehouse"></div>
+                                                    <div style="font-size: 0.75rem; color: var(--track-table-head); opacity: 0.8;" x-text="o.warehouse"></div>
                                                 </div>
                                             </div>
                                         </td>
@@ -461,18 +465,20 @@ $noFormErr = $formError === null || $formError === '';
                                             <div class="fw-medium" style="color: var(--track-text);" x-text="o.customer"></div>
                                             <div class="d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem; color: var(--track-muted);">
                                                 <span x-text="o.phone"></span>
-                                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" @click="navigator.clipboard.writeText(o.phone).then(() => notify('Teléfono copiado', 'success'))"><i class="bi bi-clipboard" style="color: var(--track-info);"></i></button>
+                                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" @click="navigator.clipboard.writeText(o.phone).then(() => notify('Teléfono copiado', 'success'))"><i class="bi bi-clipboard" style="color: var(--track-primary); filter: drop-shadow(0 0 3px var(--track-accent-glow));"></i></button>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="font-monospace d-flex align-items-center gap-2" style="color: var(--track-text);">
-                                                <span class="text-truncate" style="max-width: 120px;" x-text="o.guide"></span>
-                                                <button type="button" class="btn btn-sm p-0" title="Copiar Guía" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))"><i class="bi bi-clipboard" style="color: var(--track-info);"></i></button>
+                                            <div class="font-monospace d-flex align-items-center gap-2 mb-1" style="color: var(--track-text);">
+                                                <span class="text-truncate fw-bold" style="max-width: 150px; color: var(--track-primary); text-shadow: 0 0 5px var(--track-accent-glow);" x-text="o.guide"></span>
+                                                <button type="button" class="btn btn-sm p-0" title="Copiar Guía" @click="navigator.clipboard.writeText(o.guide).then(() => notify('Guía copiada', 'success'))">
+                                                    <i class="bi bi-clipboard" style="color: var(--track-primary); filter: drop-shadow(0 0 5px var(--track-accent-glow));"></i>
+                                                </button>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <div class="fw-bold lh-1 mb-1" style="color: var(--track-text);" x-text="o.city"></div>
-                                            <div class="small" style="color: var(--track-muted);" x-text="o.dept"></div>
+                                            <div class="lh-1" style="color: var(--track-text);">
+                                                <span class="fw-medium" x-text="o.city"></span>
+                                                <span class="small opacity-75" x-text="o.dept ? ', ' + o.dept : ''"></span>
+                                            </div>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;" :class="getBadgeClass(o.statusCode)" x-text="o.status"></span>
